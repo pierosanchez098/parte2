@@ -54,6 +54,7 @@ fun ProfessorsScreen(
     modifier: Modifier = Modifier
 ) {
     var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
+    var aula by remember { mutableStateOf<String?>(null) }  // ← nuevo estado para el aula
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -70,7 +71,7 @@ fun ProfessorsScreen(
         try {
             UnsafeSSL.ignoreSSLErrors()
 
-            val baseUrl = "http://192.168.1.29"
+            val baseUrl = "http://192.168.1.29"  // o 10.0.2.2 en emulador
             val url = "$baseUrl/get_professors.php?dni_persona=$dniPersona"
 
             val gestor = GestorSQLExternModern()
@@ -79,17 +80,14 @@ fun ProfessorsScreen(
                 gestor.connectarObj(url)
             }
 
-            android.util.Log.d("API_RESPONSE", "URL: $url")
-            android.util.Log.d("API_RESPONSE", "Respuesta: ${jsonResponse?.toString() ?: "NULL"}")
-
             if (jsonResponse == null) {
-                errorMessage = gestor.lastError ?: "No se recibió respuesta válida del servidor"
+                errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
             } else if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
                 errorMessage = jsonResponse.getString("error")
             } else {
-                val jsonArray = jsonResponse.optJSONArray("professors") ?: JSONArray()
+                aula = jsonResponse.optString("aula", null).takeIf { it?.isNotBlank() == true }
 
-                android.util.Log.d("API_RESPONSE", "Array de profesores: ${jsonArray.length()} elementos")
+                val jsonArray = jsonResponse.optJSONArray("professors") ?: JSONArray()
 
                 if (jsonArray.length() == 0) {
                     professors = emptyList()
@@ -97,15 +95,9 @@ fun ProfessorsScreen(
                     val list = mutableListOf<Professor>()
                     for (i in 0 until jsonArray.length()) {
                         val obj = jsonArray.getJSONObject(i)
-
                         val nomComplet = obj.optString("nomComplet", "Sin nombre")
                         val email = obj.optString("email", "Sin email")
-
-                        val foto: String? = if (obj.isNull("foto") || obj.optString("foto").isBlank()) {
-                            null
-                        } else {
-                            obj.optString("foto")
-                        }
+                        val foto = if (obj.isNull("foto") || obj.optString("foto").isBlank()) null else obj.optString("foto")
 
                         val assignArray = obj.optJSONArray("assignatures") ?: JSONArray()
                         val assignList = mutableListOf<String>()
@@ -113,59 +105,70 @@ fun ProfessorsScreen(
                             assignList.add(assignArray.optString(j, ""))
                         }
 
-                        list.add(
-                            Professor(
-                                nomComplet = nomComplet,
-                                email = email,
-                                foto = foto,
-                                assignatures = assignList
-                            )
-                        )
+                        list.add(Professor(nomComplet, email, foto, assignList))
                     }
                     professors = list
                 }
             }
         } catch (e: Exception) {
-            errorMessage = "Error inesperado: ${e.message} (${e.javaClass.simpleName})"
+            errorMessage = "Error inesperado: ${e.message}"
             e.printStackTrace()
         } finally {
             isLoading = false
         }
     }
 
-    when {
-        isLoading -> {
-            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        errorMessage != null -> {
-            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Column(modifier = modifier.fillMaxSize()) {
+        // Cabecera con aula
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Els meus professors",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            if (aula != null) {
                 Text(
-                    text = "Error: $errorMessage",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(24.dp)
+                    text = "Aula: $aula",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Text(
+                    text = "Grup no asignat",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-        professors.isEmpty() -> {
-            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "No hay profesores asignados en este curso",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+
+        when {
+            isLoading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        }
-        else -> {
-            LazyColumn(
-                modifier = modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(professors) { professor ->
-                    ProfessorCard(professor = professor)
+            errorMessage != null -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+                }
+            }
+            professors.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No hay profesores asignados")
+                }
+            }
+            else -> {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(professors) { professor ->
+                        ProfessorCard(professor = professor)
+                    }
                 }
             }
         }
