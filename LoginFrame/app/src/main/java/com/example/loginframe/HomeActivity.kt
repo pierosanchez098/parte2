@@ -1,4 +1,6 @@
 package com.example.loginframe
+
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.loginframe.components.AppDrawerScaffold
 import com.example.loginframe.ui.theme.LoginFrameTheme
 
 class HomeActivity : ComponentActivity() {
@@ -18,21 +21,19 @@ class HomeActivity : ComponentActivity() {
 
         setContent {
             LoginFrameTheme {
-                HomeScreen()
+                AppDrawerScaffold(
+                    currentScreenTitle = "Inicio"
+                ) { padding ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Hola! Has fet login correctament.")
+                    }
+                }
             }
         }
-    }
-}
-
-@Composable
-fun HomeScreen() {
-    // Pantalla mínima que ocupa tota la superfície i centra un text al mig
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Hola! Has fet login correctament.")
     }
 }

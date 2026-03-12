@@ -38,10 +38,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ──────────────────────────────────────────────
-// Funciones composables
-// ──────────────────────────────────────────────
-
 @Composable
 fun LoginScreen() {
     var user by remember { mutableStateOf("") }
@@ -107,7 +103,7 @@ fun LoginButton(
                 try {
                     UnsafeSSL.ignoreSSLErrors()
 
-                    val baseUrl = "https://192.168.1.29"
+                    val baseUrl = "http://10.0.2.2"
 
                     val u = URLEncoder.encode(user, "UTF-8")
                     val p = URLEncoder.encode(pass, "UTF-8")
@@ -119,17 +115,11 @@ fun LoginButton(
                         "user=$u&pass=$p"
                     )
 
-                    // Actualizamos UI en hilo principal
                     (context as? MainActivity)?.runOnUiThread {
                         if (obj == null) {
                             val missatgeError = gestor.lastError
-                                ?: "Sense resposta o error desconegut (revisa URL, port i JSON)"
-
-                            Toast.makeText(
-                                context,
-                                "Error en la connexió: $missatgeError",
-                                Toast.LENGTH_LONG
-                            ).show()
+                                ?: "Sense resposta o error desconegut"
+                            Toast.makeText(context, "Error en la connexió: $missatgeError", Toast.LENGTH_LONG).show()
                         } else {
                             val potEntrar = obj.optBoolean("pot_entrar", false)
 
@@ -137,16 +127,15 @@ fun LoginButton(
                                 val dniPersona = obj.optString("dni_persona", "") ?: ""
 
                                 if (dniPersona.isNotEmpty()) {
-                                    val intent = Intent(context, ViewProfessorsActivity::class.java)
+                                    val prefs = context.getSharedPreferences("user_prefs", android.content.Context.MODE_PRIVATE)
+                                    prefs.edit().putString("dni_persona", dniPersona).apply()
+
+                                    val intent = Intent(context, HomeActivity::class.java)
                                     intent.putExtra("DNI_PERSONA", dniPersona)
                                     context.startActivity(intent)
                                     (context as? MainActivity)?.finish()
                                 } else {
-                                    Toast.makeText(
-                                        context,
-                                        "No s'ha rebut l'identificador de l'usuari (dni_persona)",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(context, "No s'ha rebut l'identificador de l'usuari", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 val errorMsg = obj.optString("tipus_derror", "Usuari o contrasenya incorrectes")
@@ -156,11 +145,7 @@ fun LoginButton(
                     }
                 } catch (e: Exception) {
                     (context as? MainActivity)?.runOnUiThread {
-                        Toast.makeText(
-                            context,
-                            "Excepció inesperada: ${e.message ?: "Desconeguda"}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, "Excepció inesperada: ${e.message ?: "Desconeguda"}", Toast.LENGTH_SHORT).show()
                     }
                     e.printStackTrace()
                 }
@@ -177,4 +162,4 @@ fun PreviewLoginScreen() {
     LoginFrameTheme {
         LoginScreen()
     }
-}
+}s

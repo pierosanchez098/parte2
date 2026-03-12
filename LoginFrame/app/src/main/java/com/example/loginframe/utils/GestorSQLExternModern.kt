@@ -9,7 +9,6 @@ import java.net.URL
 
 class GestorSQLExternModern{
 
-    // Guardem aquí l'últim error per poder-lo mostrar a la UI si cal
     var lastError:String?=null
 
     fun connectar(urlString:String):JSONArray?{
@@ -43,10 +42,6 @@ class GestorSQLExternModern{
         }
     }
 
-    // Aquesta versió serveix per a objectes JSON. És a dir,
-    // respostes JSON de tipus:
-    // {"pot_entrar":true}
-    // per l'exemple del login
     fun connectarObj(urlString:String):JSONObject?{
         val resultat=StringBuilder()
         lastError=null
@@ -84,7 +79,6 @@ class GestorSQLExternModern{
         }
     }
 
-    // Versió per POST: enviem user i pass al body, format x-www-form-urlencoded
     fun connectarObjPOST(urlString:String,params:String):JSONObject?{
         val resultat=StringBuilder()
         lastError=null
@@ -96,14 +90,12 @@ class GestorSQLExternModern{
             connection.connectTimeout=5000
             connection.readTimeout=5000
 
-            // Necessari per enviar cos (body) en un POST
             connection.doOutput=true
             connection.setRequestProperty(
                 "Content-Type",
                 "application/x-www-form-urlencoded; charset=UTF-8"
             )
 
-            // Enviem el body del POST: user=...&pass=...
             connection.outputStream.use{os->
                 os.write(params.toByteArray(Charsets.UTF_8))
                 os.flush()

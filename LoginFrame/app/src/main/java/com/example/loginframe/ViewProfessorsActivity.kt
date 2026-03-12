@@ -1,6 +1,8 @@
 package com.example.loginframe
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.loginframe.components.AppDrawerScaffold
 import com.example.loginframe.data.model.Professor
 import com.example.loginframe.ui.theme.LoginFrameTheme
 import com.example.loginframe.utils.GestorSQLExternModern
@@ -33,15 +35,30 @@ class ViewProfessorsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val dniPersona = intent.getStringExtra("DNI_PERSONA") ?: ""
+        var dniPersona = intent.getStringExtra("DNI_PERSONA") ?: ""
+
+        if (dniPersona.isEmpty()) {
+            val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
+            dniPersona = prefs.getString("dni_persona", "") ?: ""
+        }
+
+        if (dniPersona.isEmpty()) {
+            Toast.makeText(this, "Sessió no vàlida. Torna a iniciar sessió.", Toast.LENGTH_LONG).show()
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
 
         setContent {
             LoginFrameTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ProfessorsScreen(dniPersona = dniPersona)
+                AppDrawerScaffold(
+                    currentScreenTitle = "Mis profesores",
+                    dniPersona = dniPersona
+                ) { padding ->
+                    ProfessorsScreen(
+                        dniPersona = dniPersona,
+                        modifier = Modifier.padding(padding)
+                    )
                 }
             }
         }
@@ -54,7 +71,7 @@ fun ProfessorsScreen(
     modifier: Modifier = Modifier
 ) {
     var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
-    var aula by remember { mutableStateOf<String?>(null) }  // ← nuevo estado para el aula
+    var aula by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -71,7 +88,7 @@ fun ProfessorsScreen(
         try {
             UnsafeSSL.ignoreSSLErrors()
 
-            val baseUrl = "http://192.168.1.29"  // o 10.0.2.2 en emulador
+            val baseUrl = "http://10.0.2.2"
             val url = "$baseUrl/get_professors.php?dni_persona=$dniPersona"
 
             val gestor = GestorSQLExternModern()
@@ -119,7 +136,6 @@ fun ProfessorsScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        // Cabecera con aula
         Column(
             modifier = Modifier
                 .fillMaxWidth()
