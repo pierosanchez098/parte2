@@ -86,7 +86,7 @@ fun BoletinScreen(
         try {
             UnsafeSSL.ignoreSSLErrors()
 
-            val baseUrl = "http://10.0.2.2"
+            val baseUrl = "http://10.0.2.2"  // emulador → localhost del PC
             val url = "$baseUrl/get_boletin.php?dni_persona=$dniPersona"
 
             val gestor = GestorSQLExternModern()
@@ -96,31 +96,37 @@ fun BoletinScreen(
             }
 
             android.util.Log.d("BOLETIN", "URL llamada: $url")
-            android.util.Log.d("BOLETIN", "Respuesta JSON: ${jsonResponse?.toString() ?: "NULL"}")
+            android.util.Log.d("BOLETIN", "Respuesta completa: ${jsonResponse?.toString() ?: "NULL"}")
+            android.util.Log.d("BOLETIN", "Gestor lastError: ${gestor.lastError ?: "ninguno"}")
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
             } else {
-                if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
-                    errorMessage = jsonResponse.getString("error")
+                val error = jsonResponse.optString("error", null)
+                if (error != null && error.isNotBlank()) {
+                    errorMessage = error
                 } else {
                     curso = jsonResponse.optString("curso", "Curso actual")
 
                     val jsonArray = jsonResponse.optJSONArray("notas") ?: JSONArray()
 
-                    android.util.Log.d("BOLETIN", "Número de notas: ${jsonArray.length()}")
+                    android.util.Log.d("BOLETIN", "Número de notas recibidas: ${jsonArray.length()}")
 
                     val list = mutableListOf<NotaItem>()
                     for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        list.add(
-                            NotaItem(
-                                modul = obj.optString("modul", "Módulo desconocido"),
-                                unitat = obj.optString("unitat", "UF desconocida"),
-                                nota = obj.optString("nota", "Sin nota"),
-                                dataNota = obj.optString("data_nota", "Sin fecha")
+                        try {
+                            val obj = jsonArray.getJSONObject(i)
+                            list.add(
+                                NotaItem(
+                                    modul = obj.optString("modul", "Módulo desconocido"),
+                                    unitat = obj.optString("unitat", "UF desconocida"),
+                                    nota = obj.optString("nota", "-"),
+                                    dataNota = obj.optString("data_nota", "-")
+                                )
                             )
-                        )
+                        } catch (e: Exception) {
+                            android.util.Log.e("BOLETIN_PARSE", "Error en nota $i", e)
+                        }
                     }
                     notas = list
 
@@ -130,8 +136,8 @@ fun BoletinScreen(
                 }
             }
         } catch (e: Exception) {
-            errorMessage = "Error al cargar: ${e.message}"
-            android.util.Log.e("BOLETIN", "Excepción completa", e)
+            errorMessage = "Error al cargar: ${e.message} (${e.javaClass.simpleName})"
+            android.util.Log.e("BOLETIN_ERROR", "Excepción completa", e)
         } finally {
             isLoading = false
         }
@@ -155,60 +161,55 @@ fun BoletinScreen(
             )
         }
 
-        when {
-            isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-            errorMessage != null -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = errorMessage!!,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(24.dp)
-                    )
-                }
+        } else if (errorMessage != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(24.dp)
+                )
             }
-            notas.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay notas para este curso")
-                }
+        } else if (notas.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No hay notas para este curso")
             }
-            else -> {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(notas) { nota ->
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            elevation = CardDefaults.cardElevation(4.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(nota.modul, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                                Text(nota.unitat, style = MaterialTheme.typography.bodyMedium)
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text("Nota: ${nota.nota}", fontWeight = FontWeight.Medium)
-                                    Text(nota.dataNota, style = MaterialTheme.typography.bodySmall)
-                                }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(notas) { nota ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(nota.modul, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                            Text(nota.unitat, style = MaterialTheme.typography.bodyMedium)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Nota: ${nota.nota}", fontWeight = FontWeight.Medium)
+                                Text(nota.dataNota, style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
                 }
+            }
 
-                Button(
-                    onClick = { generarPdf(notas, context, curso) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Descargar PDF")
-                }
+            Button(
+                onClick = { generarPdf(notas, context, curso) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text("Descargar PDF")
             }
         }
     }
