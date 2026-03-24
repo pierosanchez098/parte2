@@ -86,7 +86,7 @@ fun BoletinScreen(
         try {
             UnsafeSSL.ignoreSSLErrors()
 
-            val baseUrl = "http://10.0.2.2"  // emulador → localhost del PC
+            val baseUrl = "http://10.0.2.2"
             val url = "$baseUrl/get_boletin.php?dni_persona=$dniPersona"
 
             val gestor = GestorSQLExternModern()
@@ -103,7 +103,7 @@ fun BoletinScreen(
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
             } else {
                 val error = jsonResponse.optString("error", null)
-                if (error != null && error.isNotBlank()) {
+                if (!jsonResponse.isNull("error") && error.isNotBlank() && error != "null") {
                     errorMessage = error
                 } else {
                     curso = jsonResponse.optString("curso", "Curso actual")
@@ -180,6 +180,7 @@ fun BoletinScreen(
             }
         } else {
             LazyColumn(
+                modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -189,25 +190,19 @@ fun BoletinScreen(
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(nota.modul, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                            Text(nota.unitat, style = MaterialTheme.typography.bodyMedium)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("Nota: ${nota.nota}", fontWeight = FontWeight.Medium)
+                            Text(nota.modul, fontWeight = FontWeight.Bold)
+                            Text(nota.unitat)
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Nota: ${nota.nota}")
                                 Text(nota.dataNota, style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
                 }
             }
-
             Button(
                 onClick = { generarPdf(notas, context, curso) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
                 Text("Descargar PDF")
             }
