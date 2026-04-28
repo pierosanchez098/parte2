@@ -60,7 +60,7 @@ fun LoginScreen() {
             OutlinedTextField(
                 value = user,
                 onValueChange = { user = it },
-                label = { Text("Usuari") },
+                label = { Text("Usuario") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
@@ -69,7 +69,7 @@ fun LoginScreen() {
             OutlinedTextField(
                 value = pass,
                 onValueChange = { pass = it },
-                label = { Text("Contrasenya") },
+                label = { Text("Contraseña") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -118,8 +118,8 @@ fun LoginButton(
                     (context as? MainActivity)?.runOnUiThread {
                         if (obj == null) {
                             val missatgeError = gestor.lastError
-                                ?: "Sense resposta o error desconegut"
-                            Toast.makeText(context, "Error en la connexió: $missatgeError", Toast.LENGTH_LONG).show()
+                                ?: "Sin respuesta o error desconocido"
+                            Toast.makeText(context, "Error en la conexión: $missatgeError", Toast.LENGTH_LONG).show()
                         } else {
                             val potEntrar = obj.optBoolean("pot_entrar", false)
 
@@ -135,17 +135,17 @@ fun LoginButton(
                                     context.startActivity(intent)
                                     (context as? MainActivity)?.finish()
                                 } else {
-                                    Toast.makeText(context, "No s'ha rebut l'identificador de l'usuari", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "No se ha recibido el identificador del usuario.", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
-                                val errorMsg = obj.optString("tipus_derror", "Usuari o contrasenya incorrectes")
+                                val errorMsg = obj.optString("tipus_derror", "Usuario o contraseña incorrectas")
                                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 } catch (e: Exception) {
                     (context as? MainActivity)?.runOnUiThread {
-                        Toast.makeText(context, "Excepció inesperada: ${e.message ?: "Desconeguda"}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Excepción inesperada: ${e.message ?: "Desconocida"}", Toast.LENGTH_SHORT).show()
                     }
                     e.printStackTrace()
                 }

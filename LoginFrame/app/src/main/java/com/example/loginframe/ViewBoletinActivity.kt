@@ -29,6 +29,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import com.example.loginframe.data.model.NotaItem
 
 class ViewBoletinActivity : ComponentActivity() {
 
@@ -36,21 +37,31 @@ class ViewBoletinActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val gestorTema = com.example.loginframe.utils.GestorTema(this)
+
         val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
         val dniPersona = prefs.getString("dni_persona", "") ?: ""
 
         if (dniPersona.isEmpty()) {
-            Toast.makeText(this, "Sessió no vàlida", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Sesión no válida", Toast.LENGTH_LONG).show()
             startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
         }
 
         setContent {
-            LoginFrameTheme {
+
+            var isDark by remember { mutableStateOf(gestorTema.isDarkMode()) }
+
+            LoginFrameTheme(darkTheme = isDark) {
                 AppDrawerScaffold(
                     currentScreenTitle = "Boletín de notas",
-                    dniPersona = dniPersona
+                    dniPersona = dniPersona,
+                    isDarkMode = isDark,
+                    onThemeChanged = { nuevoValor ->
+                        isDark = nuevoValor
+                        gestorTema.setDarkMode(nuevoValor)
+                    }
                 ) { padding ->
                     BoletinScreen(
                         dniPersona = dniPersona,
@@ -75,7 +86,7 @@ fun BoletinScreen(
 
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
-            errorMessage = "No s'ha rebut identificador d'usuari"
+            errorMessage = "No se ha recibido el identificador del usuario"
             isLoading = false
             return@LaunchedEffect
         }
@@ -85,137 +96,99 @@ fun BoletinScreen(
 
         try {
             UnsafeSSL.ignoreSSLErrors()
-
             val baseUrl = "http://10.0.2.2"
             val url = "$baseUrl/get_boletin.php?dni_persona=$dniPersona"
-
             val gestor = GestorSQLExternModern()
 
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
                 gestor.connectarObj(url)
             }
 
-            android.util.Log.d("BOLETIN", "URL llamada: $url")
-            android.util.Log.d("BOLETIN", "Respuesta completa: ${jsonResponse?.toString() ?: "NULL"}")
-            android.util.Log.d("BOLETIN", "Gestor lastError: ${gestor.lastError ?: "ninguno"}")
-
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
             } else {
-                val error = jsonResponse.optString("error", null)
-                if (!jsonResponse.isNull("error") && error.isNotBlank() && error != "null") {
-                    errorMessage = error
+                val errorValue = jsonResponse.optString("error", "")
+                if (!jsonResponse.isNull("error") && errorValue.isNotBlank() && errorValue != "null") {
+                    errorMessage = errorValue
                 } else {
                     curso = jsonResponse.optString("curso", "Curso actual")
-
                     val jsonArray = jsonResponse.optJSONArray("notas") ?: JSONArray()
-
-                    android.util.Log.d("BOLETIN", "Número de notas recibidas: ${jsonArray.length()}")
-
                     val list = mutableListOf<NotaItem>()
                     for (i in 0 until jsonArray.length()) {
-                        try {
-                            val obj = jsonArray.getJSONObject(i)
-                            list.add(
-                                NotaItem(
-                                    modul = obj.optString("modul", "Módulo desconocido"),
-                                    unitat = obj.optString("unitat", "UF desconocida"),
-                                    nota = obj.optString("nota", "-"),
-                                    dataNota = obj.optString("data_nota", "-")
-                                )
-                            )
-                        } catch (e: Exception) {
-                            android.util.Log.e("BOLETIN_PARSE", "Error en nota $i", e)
-                        }
+                        val obj = jsonArray.getJSONObject(i)
+                        list.add(NotaItem(
+                            modul = obj.optString("modul", "Módulo"),
+                            unitat = obj.optString("unitat", "UF"),
+                            nota = obj.optString("nota", "-"),
+                            dataNota = obj.optString("data_nota", "-")
+                        ))
                     }
                     notas = list
-
-                    if (notas.isEmpty()) {
-                        errorMessage = "No hay notas registradas para este curso"
-                    }
+                    if (notas.isEmpty()) errorMessage = "No hay notas registradas"
                 }
             }
         } catch (e: Exception) {
-            errorMessage = "Error al cargar: ${e.message} (${e.javaClass.simpleName})"
-            android.util.Log.e("BOLETIN_ERROR", "Excepción completa", e)
+            errorMessage = "Error: ${e.message}"
         } finally {
             isLoading = false
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Boletín de notas",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Text(
-                text = "Curso: $curso",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            CircularProgressIndicator()
         } else if (errorMessage != null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = errorMessage!!,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(24.dp)
-                )
-            }
-        } else if (notas.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No hay notas para este curso")
-            }
+            Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
         } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Text(
+                text = "Boletín de notas disponible",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Curso escolar: $curso",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Surface(
+                modifier = Modifier.size(120.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.medium
             ) {
-                items(notas) { nota ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(nota.modul, fontWeight = FontWeight.Bold)
-                            Text(nota.unitat)
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Nota: ${nota.nota}")
-                                Text(nota.dataNota, style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
-                    }
+                Box(contentAlignment = Alignment.Center) {
+                    Text("PDF", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Button(
                 onClick = { generarPdf(notas, context, curso) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Descargar PDF")
+                Text("Descargar Boletín en PDF")
             }
+
+            Text(
+                text = "El archivo se guardará en tu carpeta de Descargas",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 16.dp),
+                color = MaterialTheme.colorScheme.outline
+            )
         }
     }
 }
-
-data class NotaItem(
-    val modul: String,
-    val unitat: String,
-    val nota: String,
-    val dataNota: String
-)
 
 private fun generarPdf(notas: List<NotaItem>, context: android.content.Context, curso: String) {
     try {

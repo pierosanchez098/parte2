@@ -6,20 +6,45 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import coil.compose.AsyncImage
 import com.example.loginframe.components.AppDrawerScaffold
+import com.example.loginframe.data.model.Estudis
 import com.example.loginframe.data.model.Professor
 import com.example.loginframe.ui.theme.LoginFrameTheme
 import com.example.loginframe.utils.GestorSQLExternModern
@@ -30,8 +55,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
-class ViewProfessorsActivity : ComponentActivity() {
-
+class ViewExpedienteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,7 +70,7 @@ class ViewProfessorsActivity : ComponentActivity() {
         }
 
         if (dniPersona.isEmpty()) {
-            Toast.makeText(this, "Sesión no válida. Vuelve a iniciar sesión.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Sesión no válida, vuelve a iniciar sesión.", Toast.LENGTH_LONG).show()
             startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
@@ -58,7 +82,7 @@ class ViewProfessorsActivity : ComponentActivity() {
 
             LoginFrameTheme(darkTheme = isDark) {
                 AppDrawerScaffold(
-                    currentScreenTitle = "Mis profesores",
+                    currentScreenTitle = "Expediente de estudios finalizados",
                     dniPersona = dniPersona,
                     isDarkMode = isDark,
                     onThemeChanged = { nuevoValor ->
@@ -66,7 +90,7 @@ class ViewProfessorsActivity : ComponentActivity() {
                         gestorTema.setDarkMode(nuevoValor)
                     }
                 ) { padding ->
-                    ProfessorsScreen(
+                    EstudiesScreen(
                         dniPersona = dniPersona,
                         modifier = Modifier.padding(padding)
                     )
@@ -74,21 +98,21 @@ class ViewProfessorsActivity : ComponentActivity() {
             }
         }
     }
-}
+    }
 
 @Composable
-fun ProfessorsScreen(
+fun EstudiesScreen(
     dniPersona: String,
     modifier: Modifier = Modifier
-) {
-    var professors by remember { mutableStateOf<List<Professor>>(emptyList()) }
-    var aula by remember { mutableStateOf<String?>(null) }
+){
+    var estudis by remember { mutableStateOf<List<Estudis>>(emptyList()) }
+    var carnet by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
-            errorMessage = "No se ha recibido el identificador del usuario"
+            errorMessage = "No s'ha rebut identificador d'usuari"
             isLoading = false
             return@LaunchedEffect
         }
@@ -100,7 +124,7 @@ fun ProfessorsScreen(
             UnsafeSSL.ignoreSSLErrors()
 
             val baseUrl = "http://10.0.2.2"
-            val url = "$baseUrl/get_professors.php?dni_persona=$dniPersona"
+            val url = "$baseUrl/get_estudis.php?dni_persona=$dniPersona"
 
             val gestor = GestorSQLExternModern()
 
@@ -113,32 +137,30 @@ fun ProfessorsScreen(
             } else if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
                 errorMessage = jsonResponse.getString("error")
             } else {
-                aula = jsonResponse.optString("aula", null).takeIf { it?.isNotBlank() == true }
 
-                val jsonArray = jsonResponse.optJSONArray("professors") ?: JSONArray()
+                carnet = jsonResponse.optString("foto_carnet", null).takeIf { it?.isNotBlank() == true }
+                val jsonArray = jsonResponse.optJSONArray("estudis") ?: JSONArray()
 
                 if (jsonArray.length() == 0) {
-                    professors = emptyList()
+                    estudis = emptyList()
                 } else {
-                    val list = mutableListOf<Professor>()
+
+                    val list = mutableListOf<Estudis>()
                     for (i in 0 until jsonArray.length()) {
                         val obj = jsonArray.getJSONObject(i)
-                        val nomComplet = obj.optString("nomComplet", "Sin nombre")
-                        val email = obj.optString("email", "Sin email")
-                        val foto = if (obj.isNull("foto") || obj.optString("foto").isBlank()) null else obj.optString("foto")
+                        val nomEstudi = obj.optString("nom_estudi", "No hay nombre de estudio")
+                        val cursoInicio = obj.optString("curs_inici", "Sin fecha de inicio")
+                        val cursoFin = obj.optString("curs_fi", "Sin fecha de fin")
+                        val status = obj.optString("status", "Sin estado")
+                        val notaFinal = obj.optString("nota_final", "Sin nota final")
 
-                        val assignArray = obj.optJSONArray("assignatures") ?: JSONArray()
-                        val assignList = mutableListOf<String>()
-                        for (j in 0 until assignArray.length()) {
-                            assignList.add(assignArray.optString(j, ""))
-                        }
 
-                        list.add(Professor(nomComplet, email, foto, assignList))
+                        list.add(Estudis(nomEstudi, cursoInicio, cursoFin, status, notaFinal))
                     }
-                    professors = list
+                    estudis = list
                 }
             }
-        } catch (e: Exception) {
+            }catch (e: Exception) {
             errorMessage = "Error inesperado: ${e.message}"
             e.printStackTrace()
         } finally {
@@ -154,18 +176,25 @@ fun ProfessorsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Mis profesores",
+                text = "Estudios finalizados",
                 style = MaterialTheme.typography.headlineMedium
             )
-            if (aula != null) {
-                Text(
-                    text = "Aula: $aula",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (carnet != null) {
+                AsyncImage(
+                    model = carnet ?: "https://via.placeholder.com/300x200?text=Sin+foto",
+                    contentDescription = "Foto del carnet del alumno",
+                    modifier = Modifier
+                        .size(width = 280.dp, height = 200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
                 )
             } else {
                 Text(
-                    text = "Grupo no asignado",
+                    text = "Sin foto carnet",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -183,9 +212,9 @@ fun ProfessorsScreen(
                     Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
                 }
             }
-            professors.isEmpty() -> {
+            estudis.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay profesores asignados")
+                    Text("No hay estudios disponibles")
                 }
             }
             else -> {
@@ -193,8 +222,8 @@ fun ProfessorsScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(professors) { professor ->
-                        ProfessorCard(professor = professor)
+                    items(estudis) { estudis ->
+                        EstudisCard(estudis)
                     }
                 }
             }
@@ -202,8 +231,9 @@ fun ProfessorsScreen(
     }
 }
 
+
 @Composable
-fun ProfessorCard(professor: Professor) {
+fun EstudisCard(estudis: Estudis) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -215,23 +245,20 @@ fun ProfessorCard(professor: Professor) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AsyncImage(
-                model = professor.foto ?: "https://via.placeholder.com/80?text=Prof",
-                contentDescription = "Foto de ${professor.nomComplet}",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = professor.nomComplet,
+                    text = estudis.nom_estudi,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = professor.email,
+                    text = estudis.curs_inici,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = estudis.curs_fi.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -239,17 +266,18 @@ fun ProfessorCard(professor: Professor) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Asignaturas:",
-                    style = MaterialTheme.typography.labelLarge
+                    text = estudis.status,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold
                 )
 
-                professor.assignatures.forEach { assign ->
-                    Text(
-                        text = "• $assign",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
+                Text(
+                    text = estudis.nota_final.toString(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

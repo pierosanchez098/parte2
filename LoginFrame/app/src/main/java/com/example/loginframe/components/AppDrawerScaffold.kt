@@ -2,16 +2,19 @@ package com.example.loginframe.components
 
 import android.content.Intent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.loginframe.HomeActivity
 import com.example.loginframe.MainActivity
 import com.example.loginframe.ViewBoletinActivity
+import com.example.loginframe.ViewExpedienteActivity
 import com.example.loginframe.ViewProfessorsActivity
 import kotlinx.coroutines.launch
 
@@ -20,11 +23,26 @@ import kotlinx.coroutines.launch
 fun AppDrawerScaffold(
     currentScreenTitle: String,
     dniPersona: String? = null,
+    isDarkMode: Boolean,
+    onThemeChanged: (Boolean) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        ThemeSelectionDialog(
+            currentThemeIsDark = isDarkMode,
+            onDismiss = { showDialog = false },
+            onConfirm = { nuevoValor ->
+                onThemeChanged(nuevoValor)
+                showDialog = false
+            }
+        )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -75,6 +93,17 @@ fun AppDrawerScaffold(
                 )
 
                 NavigationDrawerItem(
+                    icon = { Icon(Icons.Filled.Assessment, contentDescription = null) },
+                    label = { Text("Expediente") },
+                    selected = currentScreenTitle == "Expediente",
+                    onClick = {
+                        val intent = Intent(context, ViewExpedienteActivity::class.java)
+                        context.startActivity(intent)
+                        scope.launch { drawerState.close() }
+                    }
+                )
+
+                NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Schedule, contentDescription = null) },
                     label = { Text("Horario") },
                     selected = false,
@@ -84,6 +113,23 @@ fun AppDrawerScaffold(
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                            contentDescription = null
+                        )
+                    },
+                    label = { Text("Configurar Tema") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        showDialog = true
+                    }
+                )
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Logout, contentDescription = null) },
@@ -122,4 +168,67 @@ fun AppDrawerScaffold(
             content(innerPadding)
         }
     }
+}
+
+
+
+@Composable
+fun ThemeSelectionDialog(
+    currentThemeIsDark: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (Boolean) -> Unit
+) {
+    var selectedIsDark by remember { mutableStateOf(currentThemeIsDark) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Configurar tema") },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = !selectedIsDark,
+                            onClick = { selectedIsDark = false }
+                        )
+                        .padding(vertical = 8.dp)
+                ) {
+                    RadioButton(
+                        selected = !selectedIsDark,
+                        onClick = { selectedIsDark = false }
+                    )
+                    Text(text = "Tema claro", modifier = Modifier.padding(start = 12.dp))
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedIsDark,
+                            onClick = { selectedIsDark = true }
+                        )
+                        .padding(vertical = 8.dp)
+                ) {
+                    RadioButton(
+                        selected = selectedIsDark,
+                        onClick = { selectedIsDark = true }
+                    )
+                    Text(text = "Tema oscuro", modifier = Modifier.padding(start = 12.dp))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(selectedIsDark) }) {
+                Text("Aceptar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
