@@ -5,6 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ViewExpedienteActivity">
+    tools:context="com.example.feature_expediente.ViewExpedienteActivity">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

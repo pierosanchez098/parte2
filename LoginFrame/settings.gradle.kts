@@ -21,3 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "LoginFrame"
 include(":app")
+include(":domain")
+include(":data")
+include(":feature-profesores")
+include(":feature-perfil")
+include(":feature-expediente")
+include(":feature-home")
+include(":core")
