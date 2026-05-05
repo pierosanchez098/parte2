@@ -15,6 +15,7 @@ import com.example.loginframe.HomeActivity
 import com.example.loginframe.MainActivity
 import com.example.loginframe.ViewBoletinActivity
 import com.example.loginframe.ViewExpedienteActivity
+import com.example.loginframe.ViewPerfilActivity
 import com.example.loginframe.ViewProfessorsActivity
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,18 @@ fun AppDrawerScaffold(
                     style = MaterialTheme.typography.titleLarge
                 )
                 HorizontalDivider()
+
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                    label = { Text("Mi Perfil") },
+                    selected = currentScreenTitle == "Mi Perfil",
+                    onClick = {
+                        val intent = Intent(context, ViewPerfilActivity::class.java)
+                        context.startActivity(intent)
+                        scope.launch { drawerState.close() }
+                    }
+                )
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = null) },

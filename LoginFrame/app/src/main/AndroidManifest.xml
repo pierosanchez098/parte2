@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LoginFrame"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ViewPerfilActivity"
+            android:exported="false"
+            android:label="@string/title_activity_view_perfil"
+            android:theme="@style/Theme.LoginFrame" />
         <activity
             android:name=".ViewExpedienteActivity"
             android:exported="false" />
