@@ -81,6 +81,8 @@ import com.example.data.UnsafeSSL
 import com.example.domain.model.PerfilData
 import org.json.JSONArray
 import kotlin.jvm.java
+import com.example.data.SecureSessionManager
+
 
 class ViewPerfilActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,16 +91,13 @@ class ViewPerfilActivity : ComponentActivity() {
 
         val gestorTema = GestorTema(this)
 
-        var dniPersona = intent.getStringExtra("DNI_PERSONA") ?: ""
-
-        if (dniPersona.isEmpty()) {
-            val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
-            dniPersona = prefs.getString("dni_persona", "") ?: ""
-        }
+        val sessionManager = SecureSessionManager(this)
+        val dniPersona = sessionManager.getDni() ?: ""
 
         if (dniPersona.isEmpty()) {
             Toast.makeText(this, "Sesión no válida, vuelve a iniciar sesión.", Toast.LENGTH_LONG).show()
             val intent = Intent().setClassName(packageName, "com.example.loginframe.MainActivity")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
             return
@@ -161,35 +160,59 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
             try {
                 UnsafeSSL.ignoreSSLErrors()
                 val gestor = GestorSQLExternModern()
-                val url = "http://10.0.2.2/get_perfil.php?dni_persona=$dniPersona"
-                val response = gestor.connectarObj(url)
+
+                val sessionManager = SecureSessionManager(context)
+                val token = sessionManager.getToken() ?: ""
+
+                val response = gestor.connectarObjPOST(
+                    "http://10.0.2.2/get_perfil.php",
+                    "token=$token&dni_persona=$dniPersona"
+                )
 
                 if (response == null) {
                     error = gestor.lastError ?: "No se recibió respuesta del servidor"
-                } else if (response.has("error") && !response.isNull("error")) {
-                    error = response.getString("error")
                 } else {
-                    val datosJson = response.optJSONObject("datos")
+                    val newToken = response.optString("new_token", "")
+                    if (newToken.isNotEmpty()) {
+                        sessionManager.saveSession(newToken, dniPersona)
+                    }
 
-                    if (datosJson != null) {
-                        val asigJson = response.optJSONArray("asignaturas") ?: JSONArray()
-                        val listaAsignaturas = mutableListOf<String>()
+                    if (response.optBoolean("expired", false)) {
+                        sessionManager.logout()
 
-                        for (i in 0 until asigJson.length()) {
-                            listaAsignaturas.add(asigJson.getString(i))
+                        val intent = Intent().apply {
+                            setClassName(context.packageName, "com.example.loginframe.MainActivity")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }
+                        context.startActivity(intent)
+                        return@withContext
+                    }
 
-                        perfil = PerfilData(
-                            nombre = datosJson.optString("nom", "Desconocido"),
-                            apellidos = datosJson.optString("cognom", "Desconocido"),
-                            nia = datosJson.optInt("nia", 0),
-                            grupo = datosJson.optString("grupo", "Sin grupo").takeIf { it.isNotBlank() && it != "null" } ?: "Sin grupo",
-                            aula = datosJson.optString("aula", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "N/A",
-                            foto = datosJson.optString("foto", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "Sin foto",
-                            asignaturas = listaAsignaturas
-                        )
+                    if (response.has("error") && !response.isNull("error")) {
+                        error = response.getString("error")
                     } else {
-                        error = "No se encontraron datos del perfil"
+                        val datosJson = response.optJSONObject("datos")
+
+                        if (datosJson != null) {
+                            val asigJson = response.optJSONArray("asignaturas") ?: JSONArray()
+                            val listaAsignaturas = mutableListOf<String>()
+
+                            for (i in 0 until asigJson.length()) {
+                                listaAsignaturas.add(asigJson.getString(i))
+                            }
+
+                            perfil = PerfilData(
+                                nombre = datosJson.optString("nom", "Desconocido"),
+                                apellidos = datosJson.optString("cognom", "Desconocido"),
+                                nia = datosJson.optInt("nia", 0),
+                                grupo = datosJson.optString("grupo", "Sin grupo").takeIf { it.isNotBlank() && it != "null" } ?: "Sin grupo",
+                                aula = datosJson.optString("aula", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "N/A",
+                                foto = datosJson.optString("foto", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "Sin foto",
+                                asignaturas = listaAsignaturas
+                            )
+                        } else {
+                            error = "No se encontraron datos del perfil"
+                        }
                     }
                 }
             } catch (e: Exception) {

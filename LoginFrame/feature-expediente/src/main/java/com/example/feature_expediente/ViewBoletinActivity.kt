@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import com.example.data.GestorSQLExternModern
 import com.example.data.UnsafeSSL
 import com.example.domain.model.NotaItem
 import com.example.core.utils.GestorTema
+import com.example.data.SecureSessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -41,17 +43,17 @@ class ViewBoletinActivity : ComponentActivity() {
 
         val gestorTema = GestorTema(this)
 
-        val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val dniPersona = prefs.getString("dni_persona", "") ?: ""
+        val sessionManager = SecureSessionManager(this)
+        val dniPersona = sessionManager.getDni() ?: ""
 
         if (dniPersona.isEmpty()) {
             Toast.makeText(this, "Sesión no válida", Toast.LENGTH_LONG).show()
             val intent = Intent().setClassName(packageName, "com.example.loginframe.MainActivity")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
             return
         }
-
         setContent {
 
             var isDark by remember { mutableStateOf(gestorTema.isDarkMode()) }
@@ -100,21 +102,40 @@ fun BoletinScreen(
         try {
             UnsafeSSL.ignoreSSLErrors()
             val baseUrl = "http://10.0.2.2"
-            val url = "$baseUrl/get_boletin.php?dni_persona=$dniPersona"
             val gestor = GestorSQLExternModern()
 
+            val sessionManager = SecureSessionManager(context)
+            val token = sessionManager.getToken() ?: ""
+
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObj(url)
+                gestor.connectarObjPOST(
+                    "$baseUrl/get_boletin.php",
+                    "token=$token&dni_persona=$dniPersona"
+                )
             }
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
             } else {
+                val newToken = jsonResponse.optString("new_token", "")
+                if (newToken.isNotEmpty()) {
+                    sessionManager.saveSession(newToken, dniPersona)
+                }
+                if (jsonResponse.optBoolean("expired", false)) {
+                    sessionManager.logout()
+                    val intent = Intent().apply {
+                        setClassName(context.packageName, "com.example.loginframe.MainActivity")
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    context.startActivity(intent)
+                    return@LaunchedEffect
+                }
+
                 val errorValue = jsonResponse.optString("error", "")
                 if (!jsonResponse.isNull("error") && errorValue.isNotBlank() && errorValue != "null") {
                     errorMessage = errorValue
                 } else {
-                    curso = jsonResponse.optString("curso", "Curso actual")
+                    curso = jsonResponse.optString("curso", "Curso escolar")
                     val jsonArray = jsonResponse.optJSONArray("notas") ?: JSONArray()
                     val list = mutableListOf<NotaItem>()
                     for (i in 0 until jsonArray.length()) {
@@ -150,7 +171,7 @@ fun BoletinScreen(
             Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
         } else {
             Text(
-                text = "Boletín de notas disponible",
+                text = "Boletín",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -180,11 +201,11 @@ fun BoletinScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Descargar Boletín en PDF")
+                Text("Descargar boletín en PDF")
             }
 
             Text(
-                text = "El archivo se guardará en tu carpeta de Descargas",
+                text = "El archivo se guardará en tu carpeta de descargas",
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 16.dp),
                 color = MaterialTheme.colorScheme.outline

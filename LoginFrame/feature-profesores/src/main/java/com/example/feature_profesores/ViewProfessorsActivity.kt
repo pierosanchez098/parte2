@@ -26,12 +26,14 @@ import com.example.core.AppDrawerScaffold
 import com.example.core.theme.LoginFrameTheme
 import com.example.core.utils.GestorTema
 import com.example.data.GestorSQLExternModern
+import com.example.data.SecureSessionManager
 import com.example.data.UnsafeSSL
 import com.example.domain.model.Professor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.compose.ui.platform.LocalContext
 
 class ViewProfessorsActivity : ComponentActivity() {
 
@@ -41,16 +43,13 @@ class ViewProfessorsActivity : ComponentActivity() {
 
         val gestorTema = GestorTema(this)
 
-        var dniPersona = intent.getStringExtra("DNI_PERSONA") ?: ""
-
-        if (dniPersona.isEmpty()) {
-            val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
-            dniPersona = prefs.getString("dni_persona", "") ?: ""
-        }
+        val sessionManager = SecureSessionManager(this)
+        val dniPersona = sessionManager.getDni() ?: ""
 
         if (dniPersona.isEmpty()) {
             Toast.makeText(this, "Sesión no válida. Vuelve a iniciar sesión.", Toast.LENGTH_LONG).show()
             val intent = Intent().setClassName(packageName, "com.example.loginframe.MainActivity")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
             return
@@ -103,6 +102,9 @@ fun ProfessorsScreen(
         }
     }
 
+    val context = LocalContext.current
+
+
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
             errorMessage = "No se ha recibido el identificador del usuario"
@@ -117,42 +119,59 @@ fun ProfessorsScreen(
             UnsafeSSL.ignoreSSLErrors()
 
             val baseUrl = "http://10.0.2.2"
-            val url = "$baseUrl/get_professors.php?dni_persona=$dniPersona"
-
             val gestor = GestorSQLExternModern()
 
+            val sessionManager = SecureSessionManager(context)
+            val token = sessionManager.getToken() ?: ""
+
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObj(url)
+                gestor.connectarObjPOST("$baseUrl/get_professors.php", "token=$token&dni_persona=$dniPersona")
             }
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
-            } else if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
-                errorMessage = jsonResponse.getString("error")
             } else {
-                aula = jsonResponse.optString("aula", null).takeIf { it?.isNotBlank() == true }
-
-                val jsonArray = jsonResponse.optJSONArray("professors") ?: JSONArray()
-
-                if (jsonArray.length() == 0) {
-                    professors = emptyList()
-                } else {
-                    val list = mutableListOf<Professor>()
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        val nomComplet = obj.optString("nomComplet", "Sin nombre")
-                        val email = obj.optString("email", "Sin email")
-                        val foto = if (obj.isNull("foto") || obj.optString("foto").isBlank()) null else obj.optString("foto")
-
-                        val assignArray = obj.optJSONArray("assignatures") ?: JSONArray()
-                        val assignList = mutableListOf<String>()
-                        for (j in 0 until assignArray.length()) {
-                            assignList.add(assignArray.optString(j, ""))
-                        }
-
-                        list.add(Professor(nomComplet, email, foto, assignList))
+                val newToken = jsonResponse.optString("new_token", "")
+                if (newToken.isNotEmpty()) {
+                    sessionManager.saveSession(newToken, dniPersona)
+                }
+                if (jsonResponse.optBoolean("expired", false)) {
+                    sessionManager.logout()
+                    val intent = Intent().apply {
+                        setClassName(context.packageName, "com.example.loginframe.MainActivity")
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
-                    professors = list
+                    context.startActivity(intent)
+                    return@LaunchedEffect
+                }
+
+                if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
+                    errorMessage = jsonResponse.getString("error")
+                } else {
+                    aula = jsonResponse.optString("aula", null).takeIf { it?.isNotBlank() == true }
+
+                    val jsonArray = jsonResponse.optJSONArray("professors") ?: JSONArray()
+
+                    if (jsonArray.length() == 0) {
+                        professors = emptyList()
+                    } else {
+                        val list = mutableListOf<Professor>()
+                        for (i in 0 until jsonArray.length()) {
+                            val obj = jsonArray.getJSONObject(i)
+                            val nomComplet = obj.optString("nomComplet", "Sin nombre")
+                            val email = obj.optString("email", "Sin email")
+                            val foto = if (obj.isNull("foto") || obj.optString("foto").isBlank()) null else obj.optString("foto")
+
+                            val assignArray = obj.optJSONArray("assignatures") ?: JSONArray()
+                            val assignList = mutableListOf<String>()
+                            for (j in 0 until assignArray.length()) {
+                                assignList.add(assignArray.optString(j, ""))
+                            }
+
+                            list.add(Professor(nomComplet, email, foto, assignList))
+                        }
+                        professors = list
+                    }
                 }
             }
         } catch (e: Exception) {

@@ -45,29 +45,29 @@ import com.example.domain.model.Estudis
 import com.example.core.AppDrawerScaffold
 import com.example.core.theme.LoginFrameTheme
 import com.example.core.utils.GestorTema
+import com.example.data.SecureSessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.jvm.java
+import androidx.compose.ui.platform.LocalContext
 
 class ViewExpedienteActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         val gestorTema = GestorTema(this)
 
-        var dniPersona = intent.getStringExtra("DNI_PERSONA") ?: ""
-
-        if (dniPersona.isEmpty()) {
-            val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
-            dniPersona = prefs.getString("dni_persona", "") ?: ""
-        }
+        val sessionManager = SecureSessionManager(this)
+        val dniPersona = sessionManager.getDni() ?: ""
 
         if (dniPersona.isEmpty()) {
             Toast.makeText(this, "Sesión no válida, vuelve a iniciar sesión.", Toast.LENGTH_LONG).show()
             val intent = Intent().setClassName(packageName, "com.example.loginframe.MainActivity")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
             return
@@ -95,7 +95,7 @@ class ViewExpedienteActivity : ComponentActivity() {
             }
         }
     }
-    }
+}
 
 @Composable
 fun EstudiesScreen(
@@ -106,6 +106,8 @@ fun EstudiesScreen(
     var carnet by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
@@ -121,26 +123,37 @@ fun EstudiesScreen(
             UnsafeSSL.ignoreSSLErrors()
 
             val baseUrl = "http://10.0.2.2"
-            val url = "$baseUrl/get_estudis.php?dni_persona=$dniPersona"
-
             val gestor = GestorSQLExternModern()
 
+            val sessionManager = SecureSessionManager(context)
+            val token = sessionManager.getToken() ?: ""
+
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObj(url)
+                gestor.connectarObjPOST("$baseUrl/get_estudis.php", "token=$token&dni_persona=$dniPersona")
             }
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
-            } else if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
-                errorMessage = jsonResponse.getString("error")
             } else {
+                val newToken = jsonResponse.optString("new_token", "")
+                if (newToken.isNotEmpty()) {
+                    sessionManager.saveSession(newToken, dniPersona)
+                }
+                if (jsonResponse.optBoolean("expired", false)) {
+                    sessionManager.logout()
+                    val intent = Intent().apply {
+                        setClassName(context.packageName, "com.example.loginframe.MainActivity")
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    context.startActivity(intent)
+                    return@LaunchedEffect
+                }
 
-                carnet = jsonResponse.optString("foto_carnet", null).takeIf { it?.isNotBlank() == true }
-                val jsonArray = jsonResponse.optJSONArray("estudis") ?: JSONArray()
-
-                if (jsonArray.length() == 0) {
-                    estudis = emptyList()
+                if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
+                    errorMessage = jsonResponse.getString("error")
                 } else {
+                    carnet = jsonResponse.optString("foto_carnet", null).takeIf { it?.isNotBlank() == true }
+                    val jsonArray = jsonResponse.optJSONArray("estudis") ?: JSONArray()
 
                     val list = mutableListOf<Estudis>()
                     for (i in 0 until jsonArray.length()) {
@@ -151,13 +164,12 @@ fun EstudiesScreen(
                         val status = obj.optString("status", "Sin estado")
                         val notaFinal = obj.optString("nota_final", "Sin nota final")
 
-
                         list.add(Estudis(nomEstudi, cursoInicio, cursoFin, status, notaFinal))
                     }
                     estudis = list
                 }
             }
-            }catch (e: Exception) {
+        } catch (e: Exception) {
             errorMessage = "Error inesperado: ${e.message}"
             e.printStackTrace()
         } finally {
@@ -227,7 +239,6 @@ fun EstudiesScreen(
         }
     }
 }
-
 
 @Composable
 fun EstudisCard(estudis: Estudis) {

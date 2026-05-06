@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.data.SecureSessionManager
 import kotlinx.coroutines.launch
@@ -133,6 +134,8 @@ fun AppDrawerScaffold(
                         showDialog = true
                     }
                 )
+
+
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Logout, contentDescription = null) },

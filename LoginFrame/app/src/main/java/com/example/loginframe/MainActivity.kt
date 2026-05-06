@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        /*
         val sessionManager = SecureSessionManager(this)
         val token = sessionManager.getToken()
         val dni = sessionManager.getDni()
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
             finish()
             return
         }
-
+*/
         enableEdgeToEdge()
         setContent {
             LoginFrameTheme {
