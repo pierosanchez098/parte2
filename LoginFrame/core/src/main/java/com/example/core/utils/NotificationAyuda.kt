@@ -48,7 +48,7 @@ object NotificationAyuda {
         )
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // Usamos un icono de sistema para probar
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Nuevo boletín de notas disponible")
             .setContentText("Tus notas del curso $curso ya están actualizadas")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
