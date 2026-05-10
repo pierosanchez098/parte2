@@ -15,9 +15,5 @@ out/
 *.pdb
 *.cache
 
-LoginFrame/
-*.apk
-*.aab
-
 *.DS_Store
 Thumbs.db
