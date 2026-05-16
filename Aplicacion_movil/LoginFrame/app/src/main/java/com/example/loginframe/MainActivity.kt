@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.core.utils.GestorTema
 import com.example.data.GestorSQLExternModern
 import com.example.data.SecureSessionManager
 import com.example.data.UnsafeSSL
@@ -33,6 +34,7 @@ import com.example.loginframe.ui.theme.LoginFrameTheme
 import org.json.JSONObject
 import java.net.URLEncoder
 import kotlin.concurrent.thread
+
 val Blue600 = Color(0xFF2563EB)
 val Slate50 = Color(0xFFF8FAFC)
 val Slate800 = Color(0xFF1E293B)
@@ -42,10 +44,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val gestorTema = GestorTema(this)
+
         setContent {
-            LoginFrameTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = Slate50) {
-                    LoginScreen()
+            val isDark by remember { mutableStateOf(gestorTema.isDarkMode()) }
+
+            LoginFrameTheme(darkTheme = isDark) {
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    LoginScreen(isDarkMode = isDark)
                 }
             }
         }
@@ -53,9 +64,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(isDarkMode: Boolean) {
     var user by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
+
+    val colorTitulo = if (isDarkMode) Color.White else Slate800
+    val colorSubtitulo = if (isDarkMode) Color.LightGray else Slate500
 
     Column(
         modifier = Modifier
@@ -68,12 +82,12 @@ fun LoginScreen() {
             text = "Bienvenido",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = Slate800
+            color = colorTitulo
         )
         Text(
             text = "Inicia sesión para continuar",
             fontSize = 16.sp,
-            color = Slate500,
+            color = colorSubtitulo,
             modifier = Modifier.padding(bottom = 40.dp)
         )
 
@@ -98,7 +112,7 @@ fun LoginScreen() {
             value = pass,
             onValueChange = { pass = it },
             label = { Text("Contraseña") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Blue600) },
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Blue600) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             visualTransformation = PasswordVisualTransformation(),
@@ -196,6 +210,6 @@ fun LoginButton(
 @Composable
 fun PreviewLoginScreen() {
     LoginFrameTheme {
-        LoginScreen()
+        LoginScreen(isDarkMode = false)
     }
 }

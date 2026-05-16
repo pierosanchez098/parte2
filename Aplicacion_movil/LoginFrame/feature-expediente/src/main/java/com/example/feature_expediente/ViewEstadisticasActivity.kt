@@ -28,15 +28,11 @@ import com.example.core.utils.GestorTema
 import com.example.data.GestorSQLExternModern
 import com.example.data.SecureSessionManager
 import com.example.data.UnsafeSSL
+import com.example.domain.model.AsignaturaMedia
 import com.example.domain.model.FctProgreso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-
-data class AsignaturaMedia(
-    val nombre: String,
-    val media: Float
-)
 
 class ViewEstadisticasActivity : ComponentActivity() {
 
