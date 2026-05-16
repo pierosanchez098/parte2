@@ -68,6 +68,17 @@ fun AppDrawerScaffold(
                 )
 
                 NavigationDrawerItem(
+                    label = { Text("Estadísticas y Gráficos") },
+                    selected = currentScreenTitle == "Gráficos y estadísticas",
+                    onClick = {
+                        if (currentScreenTitle != "Gráficos y estadísticas") {
+                            val intent = Intent().setClassName(packageName, "com.example.feature_expediente.ViewEstadisticasActivity")
+                            context.startActivity(intent)
+                        }
+                    },
+                    icon = { Icon(Icons.Default.Analytics, contentDescription = null) }
+                )
+                NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = null) },
                     label = { Text("Inicio") },
                     selected = currentScreenTitle == "Inicio",
