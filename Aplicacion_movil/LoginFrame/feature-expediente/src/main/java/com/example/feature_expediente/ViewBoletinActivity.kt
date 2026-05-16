@@ -2,6 +2,7 @@ package com.example.feature_expediente
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.lazy.items
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
@@ -12,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -184,6 +186,40 @@ fun BoletinScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(notas) { item ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = item.modul, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                Text(text = "Unidad: ${item.unitat}", style = MaterialTheme.typography.bodyMedium)
+                                Text(text = "Fecha: ${item.dataNota}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                            }
+                            Text(
+                                text = item.nota,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Surface(
                 modifier = Modifier.size(120.dp),
                 color = MaterialTheme.colorScheme.primaryContainer,
@@ -246,8 +282,8 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
 
         var y = 60f
         val margin = 50f
+        val columnFechaX = 360f
         val columnNotaX = 500f
-
 
         canvas.drawText("BOLETÍN", margin, y, titlePaint)
         y += 25f
@@ -259,6 +295,7 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
         y += 40f
 
         canvas.drawText("MÓDULO / UNIDAD", margin, y, headerPaint)
+        canvas.drawText("FECHA", columnFechaX, y, headerPaint)
         canvas.drawText("NOTA", columnNotaX, y, headerPaint)
 
         y += 10f
@@ -269,6 +306,8 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
         for (nota in notas) {
             val textoModul = "${nota.modul} (${nota.unitat})"
             canvas.drawText(textoModul, margin, y, bodyPaint)
+
+            canvas.drawText(nota.dataNota, columnFechaX, y, bodyPaint)
 
             canvas.drawText(nota.nota, columnNotaX, y, bodyPaint.apply { isFakeBoldText = true })
             bodyPaint.isFakeBoldText = false
