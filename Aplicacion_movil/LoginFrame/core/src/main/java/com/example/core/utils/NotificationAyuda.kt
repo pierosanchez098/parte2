@@ -5,9 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.core.R
 
 object NotificationAyuda {
 
@@ -50,14 +52,24 @@ object NotificationAyuda {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        val logoColorBitmap = try {
+            BitmapFactory.decodeResource(appContext.resources, R.drawable.logo_evalis_color)
+        } catch (e: Exception) {
+            null
+        }
+
         val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_notify_chat)
+            .setSmallIcon(R.drawable.ic_evalis_silueta)
             .setContentTitle("Nuevo boletín de notas disponible")
-            .setContentText("Tus notas del curso $curso ya están actualizadas")
+            .setContentText("Se ha detectado una actualización de notas en el boletín.")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVibrate(longArrayOf(1000, 1000, 1000))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+
+        if (logoColorBitmap != null) {
+            builder.setLargeIcon(logoColorBitmap)
+        }
 
         try {
             val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

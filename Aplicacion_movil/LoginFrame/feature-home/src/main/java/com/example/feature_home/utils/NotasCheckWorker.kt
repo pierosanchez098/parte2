@@ -71,8 +71,7 @@ class NotasCheckWorker(val context: Context, workerParams: WorkerParameters) : W
                     prefs.edit().putString("ultima_data_nota_notificada", serverDataNotaRaw).apply()
 
                     NotificationAyuda.showNewBoletinNotification(
-                        context,
-                        ", se detectó una nota: $serverNota ,"
+                        context
                     )
                 }
             }
