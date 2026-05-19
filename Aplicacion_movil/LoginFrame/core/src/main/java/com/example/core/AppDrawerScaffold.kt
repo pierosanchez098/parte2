@@ -1,5 +1,6 @@
 package com.example.core
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.SecureSessionManager
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
+import androidx.core.content.edit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,6 +157,8 @@ fun AppDrawerScaffold(
                     onClick = {
                         val sessionManager = SecureSessionManager(context)
                         sessionManager.logout()
+
+                        context.getSharedPreferences("NotasWorkerPrefs", Context.MODE_PRIVATE).edit { clear() }
 
                         val intent = Intent()
                         intent.setClassName(packageName, "com.example.loginframe.MainActivity")

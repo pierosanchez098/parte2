@@ -41,4 +41,8 @@ class SecureSessionManager(context: Context) {
     fun logout() {
         sharedPreferences.edit().clear().apply()
     }
+
+    fun saveToken(token: String) {
+        sharedPreferences.edit().putString("auth_token", token).apply()
+    }
 }
