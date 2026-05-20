@@ -1,7 +1,9 @@
 package com.example.core
 
+import androidx.fragment.app.Fragment
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -10,13 +12,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.data.SecureSessionManager
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
 import androidx.core.content.edit
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,6 +30,7 @@ fun AppDrawerScaffold(
     dniPersona: String? = null,
     isDarkMode: Boolean,
     onThemeChanged: (Boolean) -> Unit,
+    onMenuOptionClicked: (String) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -59,13 +65,18 @@ fun AppDrawerScaffold(
 
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.profile_ic),
+                            contentDescription = "Mi Perfil",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Mi Perfil") },
                     selected = currentScreenTitle == "Mi Perfil",
                     onClick = {
-                        val intent = Intent().setClassName(packageName, "com.example.feature_perfil.ViewPerfilActivity")
-                        context.startActivity(intent)
                         scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Mi Perfil")
                     }
                 )
 
@@ -73,57 +84,80 @@ fun AppDrawerScaffold(
                     label = { Text("Estadísticas y Gráficos") },
                     selected = currentScreenTitle == "Gráficos y estadísticas",
                     onClick = {
-                        if (currentScreenTitle != "Gráficos y estadísticas") {
-                            val intent = Intent().setClassName(packageName, "com.example.feature_expediente.ViewEstadisticasActivity")
-                            context.startActivity(intent)
-                        }
+                        scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Gráficos y estadísticas")
                     },
-                    icon = { Icon(Icons.Default.Analytics, contentDescription = null) }
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.chart_ic),
+                            contentDescription = "Gráficos y estadísticas",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 )
+
+
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = null) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.home_ic),
+                            contentDescription = "Inicio",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Inicio") },
                     selected = currentScreenTitle == "Inicio",
                     onClick = {
-                        val intent = Intent().setClassName(packageName, "com.example.feature_home.HomeActivity")
-                        context.startActivity(intent)
                         scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Inicio")
                     }
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.School, contentDescription = null) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.profes_ic),
+                            contentDescription = "Mis profesores",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Mis profesores") },
                     selected = currentScreenTitle == "Mis profesores",
                     onClick = {
-                        val intent = Intent().setClassName(packageName, "com.example.feature_profesores.ViewProfessorsActivity")
-                        if (dniPersona != null) {
-                            intent.putExtra("DNI_PERSONA", dniPersona)
-                        }
-                        context.startActivity(intent)
                         scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Mis profesores")
                     }
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Assessment, contentDescription = null) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.check_ic),
+                            contentDescription = "Mis notas",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Boletín de notas") },
                     selected = currentScreenTitle == "Boletín de notas",
                     onClick = {
-                        val intent = Intent().setClassName(packageName, "com.example.feature_expediente.ViewBoletinActivity")
-                        context.startActivity(intent)
                         scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Boletín de notas")
                     }
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Assessment, contentDescription = null) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.libros_ic),
+                            contentDescription = "Expediente",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Expediente") },
                     selected = currentScreenTitle == "Expediente",
                     onClick = {
-                        val intent = Intent().setClassName(packageName, "com.example.feature_expediente.ViewExpedienteActivity")
-                        context.startActivity(intent)
                         scope.launch { drawerState.close() }
+                        onMenuOptionClicked("Expediente")
                     }
                 )
 
@@ -136,8 +170,11 @@ fun AppDrawerScaffold(
                 NavigationDrawerItem(
                     icon = {
                         Icon(
-                            imageVector = if (isDarkMode) Icons.Filled.DarkMode else Icons.Filled.LightMode,
-                            contentDescription = null
+                            painter = painterResource(
+                                id = if (isDarkMode) R.drawable.moon_ic else R.drawable.sun_ic
+                            ),
+                            contentDescription = "Configurar Tema",
+                            modifier = Modifier.size(24.dp)
                         )
                     },
                     label = { Text("Configurar Tema") },
@@ -151,7 +188,11 @@ fun AppDrawerScaffold(
 
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Logout, contentDescription = null) },
+                    icon = { Icon(
+                        painter = painterResource(id = R.drawable.exit_ic),
+                        contentDescription = "Salir",
+                        modifier = Modifier.size(24.dp)
+                    ) },
                     label = { Text("Cerrar sesión") },
                     selected = false,
                     onClick = {
@@ -184,8 +225,9 @@ fun AppDrawerScaffold(
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Abrir menú lateral"
+                                painter = painterResource(id = R.drawable.menu_ic),
+                                contentDescription = "Abrir menú lateral",
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
