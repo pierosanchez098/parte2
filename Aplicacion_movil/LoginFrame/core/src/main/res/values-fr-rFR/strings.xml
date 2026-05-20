@@ -87,4 +87,10 @@
     <string name="studies_no_img">Pas de photo de carte d\'identité</string>
     <string name="studies_err_no_server_response">Pas de réponse du serveur</string>
     <string name="studies_empty_list">Aucune étude disponible</string>
+
+    <string name="studies_start_label">Début: %1$s</string>
+    <string name="studies_end_label">Fin: %1$s</string>
+    <string name="studies_status_label">Statut: %1$s</string>
+    <string name="studies_grade_label">Note finale</string>
+    <string name="studies_name_label">Étude: %1$s</string>
 </resources>

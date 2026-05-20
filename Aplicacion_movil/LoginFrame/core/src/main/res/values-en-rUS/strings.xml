@@ -88,5 +88,9 @@
     <string name="studies_err_no_server_response">No response received from server</string>
     <string name="studies_empty_list">No studies available</string>
 
-
+    <string name="studies_start_label">Start: %1$s</string>
+    <string name="studies_end_label">End: %1$s</string>
+    <string name="studies_status_label">Status: %1$s</string>
+    <string name="studies_grade_label">Final Grade</string>
+    <string name="studies_name_label">Study: %1$s</string>
 </resources>

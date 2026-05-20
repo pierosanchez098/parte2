@@ -87,4 +87,10 @@
     <string name="studies_no_img">Sin foto carnet</string>
     <string name="studies_err_no_server_response">No se recibió respuesta del servidor</string>
     <string name="studies_empty_list">No hay estudios disponibles</string>
+
+    <string name="studies_start_label">Inicio: %1$s</string>
+    <string name="studies_end_label">Fin: %1$s</string>
+    <string name="studies_status_label">Estado: %1$s</string>
+    <string name="studies_grade_label">Nota final</string>
+    <string name="studies_name_label">Estudio: %1$s</string>
 </resources>
