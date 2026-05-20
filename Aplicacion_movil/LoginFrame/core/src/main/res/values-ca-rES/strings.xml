@@ -51,4 +51,8 @@
     <string name="stats_completed">Completat</string>
     <string name="stats_hours_done">Fetes</string>
     <string name="stats_hours_required">Requerides</string>
+
+    <string name="home_welcome_msg">Has iniciat sessió correctament.</string>
+
+
 </resources>

@@ -51,4 +51,6 @@
     <string name="stats_completed">Completed</string>
     <string name="stats_hours_done">Done</string>
     <string name="stats_hours_required">Required</string>
+
+    <string name="home_welcome_msg">You have logged in successfully.</string>
 </resources>

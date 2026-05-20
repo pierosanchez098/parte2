@@ -51,4 +51,6 @@
     <string name="stats_completed">Terminé</string>
     <string name="stats_hours_done">Effectuées</string>
     <string name="stats_hours_required">Requises</string>
+
+    <string name="home_welcome_msg">Vous vous êtes connecté avec succès.</string>
 </resources>

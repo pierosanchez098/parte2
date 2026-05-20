@@ -53,5 +53,7 @@
     <string name="stats_hours_done">Hechas</string>
     <string name="stats_hours_required">Requeridas</string>
 
+    <string name="home_welcome_msg">Has iniciado sesión correctamente.</string>
+
 
 </resources>

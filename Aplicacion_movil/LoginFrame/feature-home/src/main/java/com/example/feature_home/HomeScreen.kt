@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HomeScreen(
@@ -16,6 +17,6 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("Has iniciado sesión correctamente.")
+        Text(text = stringResource(id = com.example.core.R.string.home_welcome_msg))
     }
 }
