@@ -72,6 +72,7 @@ import java.io.FileOutputStream
 import android.util.Base64
 import androidx.activity.result.launch
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.core.R
 import com.example.data.GestorSQLExternModern
 import com.example.data.UnsafeSSL
@@ -104,7 +105,7 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
 
             subirFotoAlServidor(dniPersona, bytes)
 
-            Toast.makeText(context, "Foto actualizada correctamente", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.profile_toast_photo_updated), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -124,7 +125,7 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
                 )
 
                 if (response == null) {
-                    error = gestor.lastError ?: "No se recibió respuesta del servidor"
+                    error = gestor.lastError ?: context.getString(R.string.profile_err_no_server_response)
                 } else {
                     val newToken = response.optString("new_token", "")
                     if (newToken.isNotEmpty()) {
@@ -165,7 +166,7 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
                                 asignaturas = listaAsignaturas
                             )
                         } else {
-                            error = "No se encontraron datos del perfil"
+                            error = context.getString(R.string.profile_err_no_data_found)
                         }
                     }
                 }
@@ -199,7 +200,7 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
                                     if (data.foto != "Sin foto") {
                                         AsyncImage(
                                             model = data.foto,
-                                            contentDescription = "Foto de perfil",
+                                            contentDescription = stringResource(id = R.string.profile_desc_photo),
                                             modifier = Modifier
                                                 .size(80.dp)
                                                 .clip(CircleShape)
@@ -238,8 +239,8 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
                                         )
                                     ) {
                                         Icon(
-                                            painter = painterResource(id = com.example.feature_perfil.R.drawable.camara_ic),
-                                            contentDescription = "Camara",
+                                            painter = painterResource(id = R.drawable.camara_ic),
+                                            contentDescription = stringResource(id = com.example.core.R.string.profile_desc_camera),
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -259,13 +260,20 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
                             Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     painter = painterResource(id = com.example.feature_perfil.R.drawable.book),
-                                    contentDescription = "Libro",
+                                    contentDescription = stringResource(id = com.example.core.R.string.profile_desc_book),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
-                                    Text(text = "Grupo: ${data.grupo}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Text(text = "Aula asignada: ${data.aula}", style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        text = stringResource(R.string.profile_group, data.grupo),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.profile_room, data.aula),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
                                 }
                             }
                         }

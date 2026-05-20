@@ -28,4 +28,14 @@
         <string name="dialog_theme_dark">Dark theme</string>
         <string name="dialog_btn_accept">Accept</string>
         <string name="dialog_btn_cancel">Cancel</string>
+
+    <string name="profile_toast_photo_updated">Photo updated successfully</string>
+    <string name="profile_err_no_server_response">No response received from server</string>
+    <string name="profile_err_no_data_found">No profile data found</string>
+    <string name="profile_desc_photo">Profile picture</string>
+    <string name="profile_desc_camera">Camera</string>
+    <string name="profile_nia">NIA: %1$d</string>
+    <string name="profile_group">Group: %1$s</string>
+    <string name="profile_desc_book">Book</string>
+    <string name="profile_room">Assigned room: %1$s</string>
 </resources>

@@ -28,4 +28,14 @@
         <string name="dialog_theme_dark">Tema fosc</string>
         <string name="dialog_btn_accept">Acceptar</string>
         <string name="dialog_btn_cancel">Cancel·lar</string>
+
+    <string name="profile_toast_photo_updated">Foto actualitzada correctament</string>
+    <string name="profile_err_no_server_response">No s’ha rebut resposta del servidor</string>
+    <string name="profile_err_no_data_found">No s’han trobat dades del perfil</string>
+    <string name="profile_desc_photo">Foto de perfil</string>
+    <string name="profile_desc_camera">Càmera</string>
+    <string name="profile_nia">NIA: %1$d</string>
+    <string name="profile_group">Grup: %1$s</string>
+    <string name="profile_desc_book">Llibre</string>
+    <string name="profile_room">Aula assignada: %1$s</string>
 </resources>
