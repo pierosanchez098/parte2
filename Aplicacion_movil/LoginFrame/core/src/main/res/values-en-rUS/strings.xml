@@ -38,4 +38,17 @@
     <string name="profile_group">Group: %1$s</string>
     <string name="profile_desc_book">Book</string>
     <string name="profile_room">Assigned room: %1$s</string>
+
+
+    <string name="stats_title">Charts and Statistics</string>
+    <string name="stats_tab_fct">FCT Hours Completed</string>
+    <string name="stats_tab_performance">Performance</string>
+    <string name="stats_err_no_server_response">No response received from server</string>
+    <string name="stats_no_fct_data">No FCT data available</string>
+    <string name="stats_no_performance_data">No grades available to calculate performance</string>
+    <string name="stats_score">Grade: %1$.1f</string>
+    <string name="stats_study">Study: %1$s</string>
+    <string name="stats_completed">Completed</string>
+    <string name="stats_hours_done">Done</string>
+    <string name="stats_hours_required">Required</string>
 </resources>

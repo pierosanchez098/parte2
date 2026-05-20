@@ -39,4 +39,16 @@
     <string name="profile_group">Groupe: %1$s</string>
     <string name="profile_desc_book">Livre</string>
     <string name="profile_room">Salle assignée: %1$s</string>
+
+    <string name="stats_title">Graphiques et statistiques</string>
+    <string name="stats_tab_fct">FCT Heures effectuées</string>
+    <string name="stats_tab_performance">Performance</string>
+    <string name="stats_err_no_server_response">Pas de réponse du serveur</string>
+    <string name="stats_no_fct_data">Aucune donnée FCT disponible</string>
+    <string name="stats_no_performance_data">Aucune note disponible pour calculer la performance</string>
+    <string name="stats_score">Note: %1$.1f</string>
+    <string name="stats_study">Étude: %1$s</string>
+    <string name="stats_completed">Terminé</string>
+    <string name="stats_hours_done">Effectuées</string>
+    <string name="stats_hours_required">Requises</string>
 </resources>

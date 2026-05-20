@@ -38,4 +38,17 @@
     <string name="profile_group">Grup: %1$s</string>
     <string name="profile_desc_book">Llibre</string>
     <string name="profile_room">Aula assignada: %1$s</string>
+
+
+    <string name="stats_title">Gràfics i estadístiques</string>
+    <string name="stats_tab_fct">FCT Hores fetes</string>
+    <string name="stats_tab_performance">Rendiment</string>
+    <string name="stats_err_no_server_response">No s’ha rebut resposta del servidor</string>
+    <string name="stats_no_fct_data">No hi ha dades de FCT disponibles</string>
+    <string name="stats_no_performance_data">No hi ha notes per calcular el rendiment</string>
+    <string name="stats_score">Nota: %1$.1f</string>
+    <string name="stats_study">Estudi: %1$s</string>
+    <string name="stats_completed">Completat</string>
+    <string name="stats_hours_done">Fetes</string>
+    <string name="stats_hours_required">Requerides</string>
 </resources>

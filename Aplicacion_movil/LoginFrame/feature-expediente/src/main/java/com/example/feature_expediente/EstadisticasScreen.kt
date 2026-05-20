@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.core.AppDrawerScaffold
@@ -98,7 +99,7 @@ fun EstadisticasScreen(
             }
 
             if (responseFct == null && responseMedias == null) {
-                errorMessage = "No se recibió respuesta del servidor"
+                errorMessage = context.getString(com.example.core.R.string.stats_err_no_server_response)
             } else {
                 if (responseFct != null) {
                     if (responseFct.has("error") && !responseFct.isNull("error")) {
@@ -149,12 +150,12 @@ fun EstadisticasScreen(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Gráficos y estadísticas", style = MaterialTheme.typography.headlineMedium)
+            Text(text = stringResource(id = com.example.core.R.string.stats_title), style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(16.dp))
 
             TabRow(selectedTabIndex = pantallaActual, modifier = Modifier.fillMaxWidth()) {
-                Tab(selected = pantallaActual == 0, onClick = { pantallaActual = 0 }, text = { Text("FCT Horas hechas") })
-                Tab(selected = pantallaActual == 1, onClick = { pantallaActual = 1 }, text = { Text("Rendimiento") })
+                Tab(selected = pantallaActual == 0, onClick = { pantallaActual = 0 }, text = { Text(stringResource(id = com.example.core.R.string.stats_tab_fct)) })
+                Tab(selected = pantallaActual == 1, onClick = { pantallaActual = 1 }, text = { Text(stringResource(id = com.example.core.R.string.stats_tab_performance)) })
             }
         }
 
@@ -173,7 +174,7 @@ fun EstadisticasScreen(
                         GraficoProgresoFctCard(fct = datosFct!!)
                     } else {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No hay datos de FCT disponibles")
+                            Text(stringResource(id = com.example.core.R.string.stats_no_fct_data))
                         }
                     }
                 }
@@ -190,7 +191,7 @@ fun EstadisticasScreen(
                         }
                     } else {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No hay notas para calcular el rendimiento")
+                            Text(stringResource(id = com.example.core.R.string.stats_no_performance_data))
                         }
                     }
                 }
@@ -220,7 +221,7 @@ fun FilaBarraRendimiento(asignatura: AsignaturaMedia) {
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = "Nota: ${asignatura.media}",
+                    text = stringResource(id = com.example.core.R.string.stats_score, asignatura.media),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = colorBarras
@@ -270,7 +271,11 @@ fun GraficoProgresoFctCard(fct: FctProgreso) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = fct.empresa, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(text = "Estudio: ${fct.estudio}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = stringResource(id = com.example.core.R.string.stats_study, fct.estudio),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -296,7 +301,7 @@ fun GraficoProgresoFctCard(fct: FctProgreso) {
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = porcentajeTexto, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                    Text(text = "Completado", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = stringResource(id = com.example.core.R.string.stats_completed), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -305,11 +310,11 @@ fun GraficoProgresoFctCard(fct: FctProgreso) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "${fct.horasHechas}h", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text(text = "Hechas", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(id = com.example.core.R.string.stats_hours_done), style = MaterialTheme.typography.bodySmall)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "${fct.horasTotales}h", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text(text = "Requeridas", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(id = com.example.core.R.string.stats_hours_required), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
