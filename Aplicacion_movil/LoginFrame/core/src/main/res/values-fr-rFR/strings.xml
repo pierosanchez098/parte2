@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_welcome">Bienvenue</string>
+    <string name="login_subtitle">Connectez-vous pour continuer</string>
+    <string name="login_label_user">Utilisateur</string>
+    <string name="login_label_password">Mot de passe</string>
+    <string name="login_btn_enter">Connexion</string>
+    <string name="error_no_response">Pas de réponse</string>
+    <string name="error_prefix">Erreur: %1$s</string>
+    <string name="error_wrong_credentials">Identifiants incorrects</string>
+
+
+
+    <string name="menu_title">Menu</string>
+
+    <string name="menu_home">Accueil</string>
+    <string name="menu_profile">Mon profil</string>
+    <string name="menu_stats">Graphiques et statistiques</string>
+    <string name="menu_teachers">Mes professeurs</string>
+    <string name="menu_report_card">Bulletin de notes</string>
+    <string name="menu_record">Dossier académique</string>
+    <string name="menu_theme">Configurer le thème</string>
+    <string name="menu_logout">Se déconnecter</string>
+
+    <string name="menu_languages">Langues</string>
+
+    <string name="dialog_theme_title">Configurer le thème</string>
+    <string name="dialog_theme_light">Thème clair</string>
+    <string name="dialog_theme_dark">Thème sombre</string>
+    <string name="dialog_btn_accept">Accepter</string>
+    <string name="dialog_btn_cancel">Annuler</string>
+</resources>

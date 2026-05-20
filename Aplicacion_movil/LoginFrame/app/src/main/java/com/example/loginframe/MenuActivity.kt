@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
@@ -20,7 +21,7 @@ import com.example.feature_perfil.PerfilFragment
 import com.example.feature_profesores.ProfesoresFragment
 import com.example.loginframe.ui.theme.LoginFrameTheme
 
-class MenuActivity : FragmentActivity() {
+class MenuActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

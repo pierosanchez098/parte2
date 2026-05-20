@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -17,10 +19,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.SecureSessionManager
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
 import androidx.core.content.edit
+import androidx.core.os.LocaleListCompat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +62,7 @@ fun AppDrawerScaffold(
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Menú",
+                    text = stringResource(id = R.string.menu_title),
                     modifier = Modifier.padding(horizontal = 28.dp, vertical = 16.dp),
                     style = MaterialTheme.typography.titleLarge
                 )
@@ -72,7 +77,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Mi Perfil") },
+                    label = { Text(stringResource(id = R.string.menu_profile)) },
                     selected = currentScreenTitle == "Mi Perfil",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -81,7 +86,7 @@ fun AppDrawerScaffold(
                 )
 
                 NavigationDrawerItem(
-                    label = { Text("Estadísticas y Gráficos") },
+                    label = { Text(stringResource(id = R.string.menu_stats)) },
                     selected = currentScreenTitle == "Gráficos y estadísticas",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -105,7 +110,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Inicio") },
+                    label = { Text(stringResource(id = R.string.menu_home)) },
                     selected = currentScreenTitle == "Inicio",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -121,7 +126,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Mis profesores") },
+                    label = { Text(stringResource(id = R.string.menu_teachers)) },
                     selected = currentScreenTitle == "Mis profesores",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -137,7 +142,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Boletín de notas") },
+                    label = { Text(stringResource(id = R.string.menu_report_card)) },
                     selected = currentScreenTitle == "Boletín de notas",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -153,7 +158,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Expediente") },
+                    label = { Text(stringResource(id = R.string.menu_record)) },
                     selected = currentScreenTitle == "Expediente",
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -164,6 +169,8 @@ fun AppDrawerScaffold(
 
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                LanguageSelectorComponent()
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -177,7 +184,7 @@ fun AppDrawerScaffold(
                             modifier = Modifier.size(24.dp)
                         )
                     },
-                    label = { Text("Configurar Tema") },
+                    label = { Text(stringResource(id = R.string.menu_theme)) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -193,7 +200,7 @@ fun AppDrawerScaffold(
                         contentDescription = "Salir",
                         modifier = Modifier.size(24.dp)
                     ) },
-                    label = { Text("Cerrar sesión") },
+                    label = { Text(stringResource(id = R.string.menu_logout)) },
                     selected = false,
                     onClick = {
                         val sessionManager = SecureSessionManager(context)
@@ -221,14 +228,21 @@ fun AppDrawerScaffold(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(currentScreenTitle) },
+                    title = {
+                        val translatedTitle = when (currentScreenTitle.trim()) {
+                            "Inicio" -> stringResource(id = R.string.menu_home)
+                            "Mi Perfil" -> stringResource(id = R.string.menu_profile)
+                            "Gráficos y estadísticas" -> stringResource(id = R.string.menu_stats)
+                            "Mis profesores" -> stringResource(id = R.string.menu_teachers)
+                            "Boletín de notas" -> stringResource(id = R.string.menu_report_card)
+                            "Expediente" -> stringResource(id = R.string.menu_record)
+                            else -> currentScreenTitle
+                        }
+                        Text(translatedTitle)
+                    },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_ic),
-                                contentDescription = "Abrir menú lateral",
-                                modifier = Modifier.size(24.dp)
-                            )
+                            Icon(painter = painterResource(id = R.drawable.menu_ic), contentDescription = null, modifier = Modifier.size(24.dp))
                         }
                     }
                 )
@@ -239,7 +253,70 @@ fun AppDrawerScaffold(
     }
 }
 
+@Composable
+fun LanguageSelectorComponent() {
+    val languages = listOf(
+        Pair("Español", "es"),
+        Pair("Català", "ca-ES"),
+        Pair("English", "en-US"),
+        Pair("Français", "fr-FR")
+    )
+    var expanded by remember { mutableStateOf(false) }
 
+    val locales: androidx.core.os.LocaleListCompat = AppCompatDelegate.getApplicationLocales()
+
+    val currentLocaleCode = if (!locales.isEmpty) {
+        locales.get(0)?.language ?: "es"
+    } else {
+        "es"
+    }
+
+    val currentLanguageName = languages.find { it.second.startsWith(currentLocaleCode) }?.first ?: "Español"
+
+    Column(modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)) {
+        Text(
+            text = stringResource(id = R.string.menu_languages),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Box {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true }
+                    .padding(vertical = 6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.idiomas_ic),
+                    contentDescription = "Seleccionar idioma",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Text(
+                    text = currentLanguageName,
+                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                languages.forEach { (name, code) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            expanded = false
+                            val appLocale = androidx.core.os.LocaleListCompat.forLanguageTags(code)
+                            AppCompatDelegate.setApplicationLocales(appLocale)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ThemeSelectionDialog(

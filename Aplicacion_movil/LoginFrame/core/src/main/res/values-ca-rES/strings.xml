@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string name="login_welcome">Benvingut</string>
+        <string name="login_subtitle">Inicia la sessió per continuar</string>
+        <string name="login_label_user">Usuari</string>
+        <string name="login_label_password">Contrasenya</string>
+        <string name="login_btn_enter">Entrar</string>
+        <string name="error_no_response">Sense resposta</string>
+        <string name="error_prefix">Error: %1$s</string>
+        <string name="error_wrong_credentials">Credencials incorrectes</string>
+
+
+        <string name="menu_title">Menú</string>
+
+        <string name="menu_home">Inici</string>
+        <string name="menu_profile">El meu perfil</string>
+        <string name="menu_stats">Estadístiques i gràfics</string>
+        <string name="menu_teachers">Els meus professors</string>
+        <string name="menu_report_card">Butlletí de notes</string>
+        <string name="menu_record">Expedient</string>
+        <string name="menu_theme">Configurar tema</string>
+        <string name="menu_logout">Tancar sessió</string>
+
+        <string name="menu_languages">Idiomes</string>
+
+        <string name="dialog_theme_title">Configurar tema</string>
+        <string name="dialog_theme_light">Tema clar</string>
+        <string name="dialog_theme_dark">Tema fosc</string>
+        <string name="dialog_btn_accept">Acceptar</string>
+        <string name="dialog_btn_cancel">Cancel·lar</string>
+</resources>

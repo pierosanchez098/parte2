@@ -46,6 +46,8 @@ import org.json.JSONObject
 import java.net.URLEncoder
 import kotlin.concurrent.thread
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.res.stringResource
+import com.example.core.R
 
 val Blue600 = Color(0xFF2563EB)
 val Slate800 = Color(0xFF1E293B)
@@ -66,13 +68,13 @@ fun LoginScreen(isDarkMode: Boolean) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Bienvenido",
+            text = stringResource(id = R.string.login_welcome),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = colorTitulo
         )
         Text(
-            text = "Inicia sesión para continuar",
+            text = stringResource(id = R.string.login_subtitle),
             fontSize = 16.sp,
             color = colorSubtitulo,
             modifier = Modifier.padding(bottom = 40.dp)
@@ -81,7 +83,7 @@ fun LoginScreen(isDarkMode: Boolean) {
         OutlinedTextField(
             value = user,
             onValueChange = { user = it },
-            label = { Text("Usuario") },
+            label = { Text(stringResource(id = R.string.login_label_user)) },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Blue600) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
@@ -98,7 +100,7 @@ fun LoginScreen(isDarkMode: Boolean) {
         OutlinedTextField(
             value = pass,
             onValueChange = { pass = it },
-            label = { Text("Contraseña") },
+            label = { Text(stringResource(id = R.string.login_label_password)) },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Blue600) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),

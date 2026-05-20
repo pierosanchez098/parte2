@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_welcome">Welcome</string>
+    <string name="login_subtitle">Log in to continue</string>
+    <string name="login_label_user">Username</string>
+    <string name="login_label_password">Password</string>
+    <string name="login_btn_enter">Log In</string>
+    <string name="error_no_response">No response</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="error_wrong_credentials">Incorrect credentials</string>
+
+
+        <string name="menu_title">Menu</string>
+
+        <string name="menu_home">Home</string>
+        <string name="menu_profile">My Profile</string>
+        <string name="menu_stats">Charts and Statistics</string>
+        <string name="menu_teachers">My Teachers</string>
+        <string name="menu_report_card">Report Card</string>
+        <string name="menu_record">Academic Record</string>
+        <string name="menu_theme">Configure Theme</string>
+        <string name="menu_logout">Log out</string>
+
+        <string name="menu_languages">Languages</string>
+
+        <string name="dialog_theme_title">Configure theme</string>
+        <string name="dialog_theme_light">Light theme</string>
+        <string name="dialog_theme_dark">Dark theme</string>
+        <string name="dialog_btn_accept">Accept</string>
+        <string name="dialog_btn_cancel">Cancel</string>
+</resources>
