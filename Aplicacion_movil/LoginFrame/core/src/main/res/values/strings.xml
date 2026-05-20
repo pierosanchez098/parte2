@@ -81,4 +81,10 @@
     <string name="report_pdf_header_date">FECHA</string>
     <string name="report_pdf_header_grade">NOTA</string>
     <string name="report_pdf_watermark">Documento generado automáticamente por el Sistema Académico.</string>
+
+    <string name="studies_title">Estudios finalizados</string>
+    <string name="studies_img_desc">Foto del carnet del alumno</string>
+    <string name="studies_no_img">Sin foto carnet</string>
+    <string name="studies_err_no_server_response">No se recibió respuesta del servidor</string>
+    <string name="studies_empty_list">No hay estudios disponibles</string>
 </resources>

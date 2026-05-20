@@ -81,4 +81,10 @@
     <string name="report_pdf_header_date">DATA</string>
     <string name="report_pdf_header_grade">NOTA</string>
     <string name="report_pdf_watermark">Document generat automàticament pel Sistema Acadèmic.</string>
+
+    <string name="studies_title">Estudis finalitzats</string>
+    <string name="studies_img_desc">Foto del carnet de l’alumne</string>
+    <string name="studies_no_img">Sense foto carnet</string>
+    <string name="studies_err_no_server_response">No s’ha rebut resposta del servidor</string>
+    <string name="studies_empty_list">No hi ha estudis disponibles</string>
 </resources>

@@ -52,6 +52,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.jvm.java
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun EstudiesScreen(
@@ -89,7 +90,7 @@ fun EstudiesScreen(
             }
 
             if (jsonResponse == null) {
-                errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
+                errorMessage = gestor.lastError ?: context.getString(com.example.core.R.string.studies_err_no_server_response)
             } else {
                 val newToken = jsonResponse.optString("new_token", "")
                 if (newToken.isNotEmpty()) {
@@ -141,7 +142,7 @@ fun EstudiesScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Estudios finalizados",
+                text = stringResource(id = com.example.core.R.string.studies_title),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -150,7 +151,7 @@ fun EstudiesScreen(
             if (carnet != null) {
                 AsyncImage(
                     model = carnet ?: "https://via.placeholder.com/300x200?text=Sin+foto",
-                    contentDescription = "Foto del carnet del alumno",
+                    contentDescription = stringResource(id = com.example.core.R.string.studies_img_desc),
                     modifier = Modifier
                         .size(width = 280.dp, height = 200.dp)
                         .clip(RoundedCornerShape(12.dp))
@@ -159,7 +160,7 @@ fun EstudiesScreen(
                 )
             } else {
                 Text(
-                    text = "Sin foto carnet",
+                    text = stringResource(id = com.example.core.R.string.studies_no_img),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -179,7 +180,7 @@ fun EstudiesScreen(
             }
             estudis.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay estudios disponibles")
+                    Text(stringResource(id = com.example.core.R.string.studies_empty_list))
                 }
             }
             else -> {
