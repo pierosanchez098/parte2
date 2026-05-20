@@ -56,4 +56,29 @@
     <string name="home_welcome_msg">Has iniciado sesión correctamente.</string>
 
 
+    <string name="prof_title">Mis profesores</string>
+    <string name="prof_room">Aula: %1$s</string>
+    <string name="prof_no_group">Grupo no asignado</string>
+    <string name="prof_search_placeholder">Buscar por nombre o apellido…</string>
+    <string name="prof_clear_desc">Limpiar</string>
+    <string name="prof_err_no_server_response">No se recibió respuesta del servidor</string>
+    <string name="prof_no_professors">No hay profesores asignados</string>
+    <string name="prof_no_matches">No se encontraron coincidencias para \"%1$s\"</string>
+    <string name="prof_img_desc">Foto de %1$s</string>
+    <string name="prof_subjects_label">Asignaturas:</string>
+
+    <string name="report_title">Boletín</string>
+    <string name="report_school_year">Curso escolar: %1$s</string>
+    <string name="report_unit_label">Unidad: %1$s</string>
+    <string name="report_date_label">Fecha: %1$s</string>
+    <string name="report_download_btn">Descargar boletín en PDF</string>
+    <string name="report_download_footer">El archivo se guardará en tu carpeta de descargas</string>
+    <string name="report_err_no_server_response">No se recibió respuesta del servidor</string>
+    <string name="report_err_no_grades">No hay notas registradas</string>
+    <string name="report_toast_saved">PDF guardado en Descargas</string>
+    <string name="report_toast_error">Error al generar PDF: %1$s</string>
+    <string name="report_pdf_header_subject">MÓDULO / UNIDAD</string>
+    <string name="report_pdf_header_date">FECHA</string>
+    <string name="report_pdf_header_grade">NOTA</string>
+    <string name="report_pdf_watermark">Documento generado automáticamente por el Sistema Académico.</string>
 </resources>

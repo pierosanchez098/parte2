@@ -34,6 +34,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun ProfessorsScreen(
@@ -85,7 +86,7 @@ fun ProfessorsScreen(
             }
 
             if (jsonResponse == null) {
-                errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
+                errorMessage = gestor.lastError ?: context.getString(com.example.core.R.string.prof_err_no_server_response)
             } else {
                 val newToken = jsonResponse.optString("new_token", "")
                 if (newToken.isNotEmpty()) {
@@ -146,18 +147,18 @@ fun ProfessorsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Mis profesores",
+                text = stringResource(id = com.example.core.R.string.prof_title),
                 style = MaterialTheme.typography.headlineMedium
             )
             if (aula != null) {
                 Text(
-                    text = "Aula: $aula",
+                    text = stringResource(id = com.example.core.R.string.prof_room, aula!!),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
             } else {
                 Text(
-                    text = "Grupo no asignado",
+                    text = stringResource(id = com.example.core.R.string.prof_no_group),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -169,12 +170,12 @@ fun ProfessorsScreen(
                 value = textoBusqueda,
                 onValueChange = { textoBusqueda = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Buscar por nombre o apellido...") },
+                placeholder = { Text(stringResource(id = com.example.core.R.string.prof_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (textoBusqueda.isNotEmpty()) {
                         IconButton(onClick = { textoBusqueda = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Limpiar")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(id = com.example.core.R.string.prof_clear_desc))
                         }
                     }
                 },
@@ -196,7 +197,7 @@ fun ProfessorsScreen(
             }
             professors.isEmpty() -> {
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("No hay profesores asignados")
+                    Text(stringResource(id = com.example.core.R.string.prof_no_professors))
                 }
             }
             else -> {
@@ -215,7 +216,7 @@ fun ProfessorsScreen(
                                 modifier = Modifier.fillMaxWidth().padding(32.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("No se encontraron coincidencias para \"$textoBusqueda\"")
+                                Text(stringResource(id = com.example.core.R.string.prof_no_matches, textoBusqueda))
                             }
                         }
                     }
@@ -240,7 +241,7 @@ fun ProfessorCard(professor: Professor) {
         ) {
             AsyncImage(
                 model = professor.foto ?: "https://via.placeholder.com/80?text=Prof",
-                contentDescription = "Foto de ${professor.nomComplet}",
+                contentDescription = stringResource(id = com.example.core.R.string.prof_img_desc, professor.nomComplet),
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape),
@@ -262,7 +263,7 @@ fun ProfessorCard(professor: Professor) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Asignaturas:",
+                    text = stringResource(id = com.example.core.R.string.prof_subjects_label),
                     style = MaterialTheme.typography.labelLarge
                 )
 

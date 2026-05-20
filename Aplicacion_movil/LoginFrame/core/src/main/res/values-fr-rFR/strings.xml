@@ -53,4 +53,32 @@
     <string name="stats_hours_required">Requises</string>
 
     <string name="home_welcome_msg">Vous vous êtes connecté avec succès.</string>
+
+
+    <string name="prof_title">Mes professeurs</string>
+    <string name="prof_room">Salle: %1$s</string>
+    <string name="prof_no_group">Aucun groupe assigné</string>
+    <string name="prof_search_placeholder">Rechercher par nom ou prénom…</string>
+    <string name="prof_clear_desc">Effacer</string>
+    <string name="prof_err_no_server_response">Pas de réponse du serveur</string>
+    <string name="prof_no_professors">Aucun professeur assigné</string>
+    <string name="prof_no_matches">Aucune correspondance trouvée pour \"%1$s\"</string>
+    <string name="prof_img_desc">Photo de %1$s</string>
+    <string name="prof_subjects_label">Matières:</string>
+
+
+    <string name="report_title">Bulletin de notes</string>
+    <string name="report_school_year">Année scolaire: %1$s</string>
+    <string name="report_unit_label">Unité: %1$s</string>
+    <string name="report_date_label">Date: %1$s</string>
+    <string name="report_download_btn">Télécharger le bulletin en PDF</string>
+    <string name="report_download_footer">Le fichier sera enregistré dans votre dossier de téléchargements</string>
+    <string name="report_err_no_server_response">Pas de réponse du serveur</string>
+    <string name="report_err_no_grades">Aucune note enregistrée</string>
+    <string name="report_toast_saved">PDF enregistré dans Téléchargements</string>
+    <string name="report_toast_error">Erreur lors de la génération du PDF: %1$s</string>
+    <string name="report_pdf_header_subject">MODULE / UNITÉ</string>
+    <string name="report_pdf_header_date">DATE</string>
+    <string name="report_pdf_header_grade">NOTE</string>
+    <string name="report_pdf_watermark">Document généré automatiquement por le Système Académique.</string>
 </resources>

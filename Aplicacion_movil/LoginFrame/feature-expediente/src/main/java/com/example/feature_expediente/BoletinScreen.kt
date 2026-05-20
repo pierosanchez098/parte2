@@ -74,7 +74,7 @@ fun BoletinScreen(
             }
 
             if (jsonResponse == null) {
-                errorMessage = gestor.lastError ?: "No se recibió respuesta del servidor"
+                errorMessage = gestor.lastError ?: context.getString(com.example.core.R.string.report_err_no_server_response)
             } else {
                 val newToken = jsonResponse.optString("new_token", "")
                 if (newToken.isNotEmpty()) {
@@ -107,7 +107,7 @@ fun BoletinScreen(
                         ))
                     }
                     notas = list
-                    if (notas.isEmpty()) errorMessage = "No hay notas registradas"
+                    if (notas.isEmpty()) errorMessage = context.getString(com.example.core.R.string.report_err_no_grades)
                 }
             }
         } catch (e: Exception) {
@@ -130,12 +130,12 @@ fun BoletinScreen(
             Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
         } else {
             Text(
-                text = "Boletín",
+                text = stringResource(id = com.example.core.R.string.report_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Curso escolar: $curso",
+                text = stringResource(id = com.example.core.R.string.report_school_year, curso),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(top = 8.dp)
@@ -161,8 +161,8 @@ fun BoletinScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(text = item.modul, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                                Text(text = "Unidad: ${item.unitat}", style = MaterialTheme.typography.bodyMedium)
-                                Text(text = "Fecha: ${item.dataNota}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                                Text(text = stringResource(id = com.example.core.R.string.report_unit_label, item.unitat), style = MaterialTheme.typography.bodyMedium)
+                                Text(text = stringResource(id = com.example.core.R.string.report_date_label, item.dataNota), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
                             }
                             Text(
                                 text = item.nota,
@@ -194,11 +194,11 @@ fun BoletinScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Descargar boletín en PDF")
+                Text(stringResource(id = com.example.core.R.string.report_download_btn))
             }
 
             Text(
-                text = "El archivo se guardará en tu carpeta de descargas",
+                text = stringResource(id = com.example.core.R.string.report_download_footer),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 16.dp),
                 color = MaterialTheme.colorScheme.outline
@@ -242,18 +242,18 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
         val columnFechaX = 360f
         val columnNotaX = 500f
 
-        canvas.drawText("BOLETÍN", margin, y, titlePaint)
+        canvas.drawText(context.getString(com.example.core.R.string.report_title).uppercase(), margin, y, titlePaint)
         y += 25f
-        canvas.drawText("Curso escolar: $curso", margin, y, bodyPaint.apply { textSize = 14f })
+        canvas.drawText(context.getString(com.example.core.R.string.report_school_year, curso), margin, y, bodyPaint.apply { textSize = 14f })
 
         y += 20f
         canvas.drawLine(margin, y, 545f, y, linePaint.apply { strokeWidth = 2f })
 
         y += 40f
 
-        canvas.drawText("MÓDULO / UNIDAD", margin, y, headerPaint)
-        canvas.drawText("FECHA", columnFechaX, y, headerPaint)
-        canvas.drawText("NOTA", columnNotaX, y, headerPaint)
+        canvas.drawText(context.getString(com.example.core.R.string.report_pdf_header_subject), margin, y, headerPaint)
+        canvas.drawText(context.getString(com.example.core.R.string.report_pdf_header_date), columnFechaX, y, headerPaint)
+        canvas.drawText(context.getString(com.example.core.R.string.report_pdf_header_grade), columnNotaX, y, headerPaint)
 
         y += 10f
         canvas.drawLine(margin, y, 545f, y, linePaint.apply { strokeWidth = 1f })
@@ -296,7 +296,7 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
             canvas.drawText(nota.dataNota, columnFechaX, yAlineacionColumnas, bodyPaint)
 
             canvas.drawText(nota.nota, columnNotaX, yAlineacionColumnas, bodyPaint.apply { isFakeBoldText = true })
-            bodyPaint.isFakeBoldText = false // Reseteamos el bold
+            bodyPaint.isFakeBoldText = false
 
             val alturaDelTexto = textLayout.height
 
@@ -308,7 +308,7 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
         }
 
         y = 800f
-        canvas.drawText("Documento generado automáticamente por el Sistema Académico.", margin, y, bodyPaint.apply {
+        canvas.drawText(context.getString(com.example.core.R.string.report_pdf_watermark), margin, y, bodyPaint.apply {
             textSize = 10f
             color = Color.GRAY
         })
@@ -345,9 +345,9 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
             }
         }
 
-        Toast.makeText(context, "PDF guardado en Descargas", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_saved), Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
-        Toast.makeText(context, "Error al generar PDF: ${e.message}", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_error, e.message ?: ""), Toast.LENGTH_LONG).show()
         e.printStackTrace()
     }
 }

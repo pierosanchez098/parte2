@@ -55,4 +55,30 @@
     <string name="home_welcome_msg">Has iniciat sessió correctament.</string>
 
 
+
+    <string name="prof_title">Els meus professors</string>
+    <string name="prof_room">Aula: %1$s</string>
+    <string name="prof_no_group">Grup no assignat</string>
+    <string name="prof_search_placeholder">Buscar per nom o cognom…</string>
+    <string name="prof_clear_desc">Netejar</string>
+    <string name="prof_err_no_server_response">No s’ha rebut resposta del servidor</string>
+    <string name="prof_no_professors">No hi ha professors assignats</string>
+    <string name="prof_no_matches">No s’han trobat coincidències per a \"%1$s\"</string>
+    <string name="prof_img_desc">Foto de %1$s</string>
+    <string name="prof_subjects_label">Assignatures:</string>
+
+    <string name="report_title">Butlletí</string>
+    <string name="report_school_year">Curs escolar: %1$s</string>
+    <string name="report_unit_label">Unitat: %1$s</string>
+    <string name="report_date_label">Data: %1$s</string>
+    <string name="report_download_btn">Descarregar butlletí en PDF</string>
+    <string name="report_download_footer">El fitxer es desarà a la teva carpeta de descàrregues</string>
+    <string name="report_err_no_server_response">No s’ha rebut resposta del servidor</string>
+    <string name="report_err_no_grades">No hi ha notes registrades</string>
+    <string name="report_toast_saved">PDF desat a Descàrregues</string>
+    <string name="report_toast_error">Error en generar el PDF: %1$s</string>
+    <string name="report_pdf_header_subject">MÒDUL / UNITAT</string>
+    <string name="report_pdf_header_date">DATA</string>
+    <string name="report_pdf_header_grade">NOTA</string>
+    <string name="report_pdf_watermark">Document generat automàticament pel Sistema Acadèmic.</string>
 </resources>
