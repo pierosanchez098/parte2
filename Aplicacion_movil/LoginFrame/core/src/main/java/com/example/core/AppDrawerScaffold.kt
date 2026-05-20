@@ -289,7 +289,7 @@ fun LanguageSelectorComponent() {
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.idiomas_ic),
-                    contentDescription = "Seleccionar idioma",
+                    contentDescription = stringResource(id = R.string.lang_icon_desc),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -328,7 +328,7 @@ fun ThemeSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Configurar tema") },
+        title = { Text(text = stringResource(id = R.string.theme_dialog_title)) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
@@ -345,7 +345,10 @@ fun ThemeSelectionDialog(
                         selected = !selectedIsDark,
                         onClick = { selectedIsDark = false }
                     )
-                    Text(text = "Tema claro", modifier = Modifier.padding(start = 12.dp))
+                    Text(
+                        text = stringResource(id = R.string.theme_light_option),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
                 }
 
                 Row(
@@ -362,18 +365,21 @@ fun ThemeSelectionDialog(
                         selected = selectedIsDark,
                         onClick = { selectedIsDark = true }
                     )
-                    Text(text = "Tema oscuro", modifier = Modifier.padding(start = 12.dp))
+                    Text(
+                        text = stringResource(id = R.string.theme_dark_option),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(selectedIsDark) }) {
-                Text("Aceptar")
+                Text(stringResource(id = R.string.theme_btn_accept))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.theme_btn_cancel))
             }
         }
     )

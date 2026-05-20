@@ -4,7 +4,7 @@
     <string name="login_subtitle">Connectez-vous pour continuer</string>
     <string name="login_label_user">Utilisateur</string>
     <string name="login_label_password">Mot de passe</string>
-    <string name="login_btn_enter">Connexion</string>
+    <string name="login_btn_enter">Entrer</string>
     <string name="error_no_response">Pas de réponse</string>
     <string name="error_prefix">Erreur: %1$s</string>
     <string name="error_wrong_credentials">Identifiants incorrects</string>
@@ -93,4 +93,14 @@
     <string name="studies_status_label">Statut: %1$s</string>
     <string name="studies_grade_label">Note finale</string>
     <string name="studies_name_label">Étude: %1$s</string>
+
+    <string name="theme_dialog_title">Configurer le thème</string>
+    <string name="theme_light_option">Thème clair</string>
+    <string name="theme_dark_option">Thème sombre</string>
+    <string name="theme_btn_accept">Accepter</string>
+    <string name="theme_btn_cancel">Annuler</string>
+    <string name="theme_icon_desc">Configurer le thème</string>
+    <string name="lang_icon_desc">Choisir la langue</string>
+
+    <string name="profile_toast_photo_error">Erreur lors du chargement de l\'image sur le serveur</string>
 </resources>

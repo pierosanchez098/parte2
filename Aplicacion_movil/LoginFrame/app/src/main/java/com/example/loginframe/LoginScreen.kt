@@ -46,6 +46,7 @@ import org.json.JSONObject
 import java.net.URLEncoder
 import kotlin.concurrent.thread
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.core.R
 
@@ -84,7 +85,12 @@ fun LoginScreen(isDarkMode: Boolean) {
             value = user,
             onValueChange = { user = it },
             label = { Text(stringResource(id = R.string.login_label_user)) },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Blue600) },
+            leadingIcon = { Icon(
+                painter = painterResource(id = R.drawable.person_login_ic),
+                contentDescription = null,
+                tint = Blue600,
+                modifier = Modifier.size(24.dp)
+            ) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -101,7 +107,14 @@ fun LoginScreen(isDarkMode: Boolean) {
             value = pass,
             onValueChange = { pass = it },
             label = { Text(stringResource(id = R.string.login_label_password)) },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Blue600) },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.lock_ic),
+                    contentDescription = null,
+                    tint = Blue600,
+                    modifier = Modifier.size(24.dp)
+                )
+            },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             visualTransformation = PasswordVisualTransformation(),
@@ -195,7 +208,11 @@ fun LoginButton(
         if (isLoading) {
             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
         } else {
-            Text("Entrar", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = stringResource(id = R.string.login_btn_enter),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

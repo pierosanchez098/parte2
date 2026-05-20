@@ -93,4 +93,14 @@
     <string name="studies_status_label">Estat: %1$s</string>
     <string name="studies_grade_label">Nota final</string>
     <string name="studies_name_label">Estudi: %1$s</string>
+
+    <string name="theme_dialog_title">Configurar tema</string>
+    <string name="theme_light_option">Tema clar</string>
+    <string name="theme_dark_option">Tema fosc</string>
+    <string name="theme_btn_accept">Acceptar</string>
+    <string name="theme_btn_cancel">Cancel·lar</string>
+    <string name="theme_icon_desc">Configurar Tema</string>
+    <string name="lang_icon_desc">Seleccionar idioma</string>
+
+    <string name="profile_toast_photo_error">Error en pujar la imatge al servidor</string>
 </resources>

@@ -93,4 +93,14 @@
     <string name="studies_status_label">Status: %1$s</string>
     <string name="studies_grade_label">Final Grade</string>
     <string name="studies_name_label">Study: %1$s</string>
+
+    <string name="theme_dialog_title">Configure theme</string>
+    <string name="theme_light_option">Light theme</string>
+    <string name="theme_dark_option">Dark theme</string>
+    <string name="theme_btn_accept">Accept</string>
+    <string name="theme_btn_cancel">Cancel</string>
+    <string name="theme_icon_desc">Configure Theme</string>
+    <string name="lang_icon_desc">Select language</string>
+
+    <string name="profile_toast_photo_error">Error uploading image to server</string>
 </resources>
