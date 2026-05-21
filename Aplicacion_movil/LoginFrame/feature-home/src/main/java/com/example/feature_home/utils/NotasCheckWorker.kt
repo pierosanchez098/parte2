@@ -3,6 +3,7 @@ package com.example.feature_home.utils
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.core.utils.DeviceTracker
 import com.example.core.utils.NotificationAyuda
 import com.example.data.SecureSessionManager
 import com.example.data.UnsafeSSL
@@ -33,11 +34,22 @@ class NotasCheckWorker(val context: Context, workerParams: WorkerParameters) : W
             conn.requestMethod = "POST"
             conn.doOutput = true
 
-            val data = "dni_persona=${URLEncoder.encode(dniPersona, "UTF-8")}&token=${URLEncoder.encode(tokenActual, "UTF-8")}"
+            val tracker = DeviceTracker(context)
+            val userAgentHash = tracker.getUserAgentHash()
+
+            val dniEnc = URLEncoder.encode(dniPersona, "UTF-8")
+            val tokenEnc = URLEncoder.encode(tokenActual, "UTF-8")
+            val hashEnc = URLEncoder.encode(userAgentHash, "UTF-8")
+
+            val data = "dni_persona=$dniEnc&token=$tokenEnc&user_agent_hash=$hashEnc"
             OutputStreamWriter(conn.outputStream).use { it.write(data) }
 
             val response = conn.inputStream.bufferedReader().use { it.readText() }
             val json = JSONObject(response)
+
+            if (json.optBoolean("expired", false)) {
+                return Result.failure()
+            }
 
             if (!json.isNull("error")) {
                 return Result.failure()
@@ -51,8 +63,6 @@ class NotasCheckWorker(val context: Context, workerParams: WorkerParameters) : W
             if (!json.isNull("ultima_nota")) {
                 val ultimaNotaObj = json.getJSONObject("ultima_nota")
                 val serverDataNotaRaw = ultimaNotaObj.optString("data_nota_raw", "")
-                val serverNota = ultimaNotaObj.optString("nota", "")
-                val serverUf = ultimaNotaObj.optString("uf_id", "")
 
                 val prefs = context.getSharedPreferences("NotasWorkerPrefs", Context.MODE_PRIVATE)
 
@@ -61,18 +71,13 @@ class NotasCheckWorker(val context: Context, workerParams: WorkerParameters) : W
 
                 if (esPrimeraCarga) {
                     prefs.edit().putString("ultima_data_nota_notificada", serverDataNotaRaw).apply()
-
-
                     return Result.success()
                 }
 
                 if (serverDataNotaRaw != ultimaDataNotificada && serverDataNotaRaw.isNotEmpty()) {
-
                     prefs.edit().putString("ultima_data_nota_notificada", serverDataNotaRaw).apply()
 
-                    NotificationAyuda.showNewBoletinNotification(
-                        context
-                    )
+                    NotificationAyuda.showNewBoletinNotification(context)
                 }
             }
 
