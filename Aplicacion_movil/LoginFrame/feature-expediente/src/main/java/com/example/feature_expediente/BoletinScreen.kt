@@ -8,6 +8,8 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,12 +27,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.core.AppDrawerScaffold
 import com.example.core.theme.LoginFrameTheme
+import com.example.core.utils.DeviceTracker
 import com.example.data.GestorSQLExternModern
 import com.example.data.UnsafeSSL
 import com.example.domain.model.NotaItem
 import com.example.core.utils.GestorTema
 import com.example.data.SecureSessionManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -48,6 +52,9 @@ fun BoletinScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
+    val sessionManager = remember { SecureSessionManager(context) }
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
             errorMessage = "No se ha recibido el identificador del usuario"
@@ -63,23 +70,21 @@ fun BoletinScreen(
             val baseUrl = "http://10.0.2.2"
             val gestor = GestorSQLExternModern()
 
-            val sessionManager = SecureSessionManager(context)
             val token = sessionManager.getToken() ?: ""
+            val tracker = DeviceTracker(context)
+            val userAgentHash = tracker.getUserAgentHash()
 
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
                 gestor.connectarObjPOST(
                     "$baseUrl/get_boletin.php",
-                    "token=$token&dni_persona=$dniPersona"
+                    "token=$token&dni_persona=$dniPersona&user_agent_hash=$userAgentHash"
                 )
             }
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: context.getString(com.example.core.R.string.report_err_no_server_response)
             } else {
-                val newToken = jsonResponse.optString("new_token", "")
-                if (newToken.isNotEmpty()) {
-                    sessionManager.saveSession(newToken, dniPersona)
-                }
+
                 if (jsonResponse.optBoolean("expired", false)) {
                     sessionManager.logout()
                     val intent = Intent().apply {
@@ -88,6 +93,11 @@ fun BoletinScreen(
                     }
                     context.startActivity(intent)
                     return@LaunchedEffect
+                }
+
+                val newToken = jsonResponse.optString("new_token", "")
+                if (newToken.isNotEmpty()) {
+                    sessionManager.saveSession(newToken, dniPersona)
                 }
 
                 val errorValue = jsonResponse.optString("error", "")
@@ -190,7 +200,13 @@ fun BoletinScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { generarPdf(notas, context, curso) },
+                onClick = {
+                    coroutineScope.launch {
+                        withContext(Dispatchers.IO) {
+                            generarPdf(notas, context, curso)
+                        }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {
@@ -230,6 +246,7 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
             color = Color.BLACK
             textSize = 12f
         }
+
 
         val linePaint = Paint().apply {
             color = Color.LTGRAY
@@ -345,9 +362,13 @@ private fun generarPdf(notas: List<NotaItem>, context: Context, curso: String) {
             }
         }
 
-        Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_saved), Toast.LENGTH_LONG).show()
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_saved), Toast.LENGTH_LONG).show()
+        }
     } catch (e: Exception) {
-        Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_error, e.message ?: ""), Toast.LENGTH_LONG).show()
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            Toast.makeText(context, context.getString(com.example.core.R.string.report_toast_error, e.message ?: ""), Toast.LENGTH_LONG).show()
+        }
         e.printStackTrace()
     }
 }

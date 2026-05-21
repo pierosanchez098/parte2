@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.core.AppDrawerScaffold
 import com.example.core.theme.LoginFrameTheme
+import com.example.core.utils.Device
+import com.example.core.utils.DeviceTracker
 import com.example.core.utils.GestorTema
 import com.example.data.GestorSQLExternModern
 import com.example.data.SecureSessionManager
@@ -47,6 +49,7 @@ fun EstadisticasScreen(
     var pantallaActual by remember { mutableStateOf(0) }
 
     val context = LocalContext.current
+    val sessionManager = remember { SecureSessionManager(context) }
 
     LaunchedEffect(dniPersona) {
         if (dniPersona.isEmpty()) {
@@ -63,38 +66,53 @@ fun EstadisticasScreen(
 
             val baseUrl = "http://10.0.2.2"
             val gestor = GestorSQLExternModern()
-            val sessionManager = SecureSessionManager(context)
             val token = sessionManager.getToken() ?: ""
+            val tracker = DeviceTracker(context)
+            val userAgentHash = tracker.getUserAgentHash()
 
             val responseFct: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObjPOST("$baseUrl/get_progres_fct.php", "token=$token&dni_persona=$dniPersona")
+                gestor.connectarObjPOST(
+                    "$baseUrl/get_progres_fct.php",
+                    "token=$token&dni_persona=$dniPersona&user_agent_hash=$userAgentHash"
+                )
             }
 
             var tokenActualizado = token
             if (responseFct != null) {
+                if (responseFct.optBoolean("expired", false)) {
+                    val mensajeServidor = responseFct.optString("error", null)
+                    withContext(Dispatchers.Main) {
+                        Device(context, sessionManager).forzarReLogin(mensajeServidor)
+                    }
+                    return@LaunchedEffect
+                }
+
                 val newToken = responseFct.optString("new_token", "")
                 if (newToken.isNotEmpty()) {
                     sessionManager.saveSession(newToken, dniPersona)
                     tokenActualizado = newToken
                 }
-                if (responseFct.optBoolean("expired", false)) {
-                    triggerLogout(context, sessionManager)
-                    return@LaunchedEffect
-                }
             }
 
             val responseMedias: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObjPOST("$baseUrl/get_medias_asignaturas.php", "token=$tokenActualizado&dni_persona=$dniPersona")
+                gestor.connectarObjPOST(
+                    "$baseUrl/get_medias_asignaturas.php",
+                    "token=$tokenActualizado&dni_persona=$dniPersona&user_agent_hash=$userAgentHash"
+                )
             }
 
             if (responseMedias != null) {
+                if (responseMedias.optBoolean("expired", false)) {
+                    val mensajeServidor = responseMedias.optString("error", null)
+                    withContext(Dispatchers.Main) {
+                        Device(context, sessionManager).forzarReLogin(mensajeServidor)
+                    }
+                    return@LaunchedEffect
+                }
+
                 val newToken2 = responseMedias.optString("new_token", "")
                 if (newToken2.isNotEmpty()) {
                     sessionManager.saveSession(newToken2, dniPersona)
-                }
-                if (responseMedias.optBoolean("expired", false)) {
-                    triggerLogout(context, sessionManager)
-                    return@LaunchedEffect
                 }
             }
 
@@ -102,8 +120,8 @@ fun EstadisticasScreen(
                 errorMessage = context.getString(com.example.core.R.string.stats_err_no_server_response)
             } else {
                 if (responseFct != null) {
-                    if (responseFct.has("error") && !responseFct.isNull("error")) {
-                    } else {
+                    val errorFct = responseFct.optString("error", "")
+                    if (responseFct.isNull("error") || errorFct.isBlank() || errorFct == "null") {
                         val fctObj = responseFct.optJSONObject("fct")
                         if (fctObj != null) {
                             datosFct = FctProgreso(
@@ -117,9 +135,10 @@ fun EstadisticasScreen(
                 }
 
                 if (responseMedias != null) {
-                    if (responseMedias.has("error") && !responseMedias.isNull("error")) {
+                    val errorMedias = responseMedias.optString("error", "")
+                    if (!responseMedias.isNull("error") && errorMedias.isNotBlank() && errorMedias != "null") {
                         if (datosFct == null) {
-                            errorMessage = responseMedias.getString("error")
+                            errorMessage = errorMedias
                         }
                     } else {
                         val jsonArray = responseMedias.optJSONArray("medias")
@@ -246,15 +265,6 @@ fun FilaBarraRendimiento(asignatura: AsignaturaMedia) {
             }
         }
     }
-}
-
-fun triggerLogout(context: Context, sessionManager: SecureSessionManager) {
-    sessionManager.logout()
-    val intent = Intent().apply {
-        setClassName(context.packageName, "com.example.loginframe.MainActivity")
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    }
-    context.startActivity(intent)
 }
 
 @Composable

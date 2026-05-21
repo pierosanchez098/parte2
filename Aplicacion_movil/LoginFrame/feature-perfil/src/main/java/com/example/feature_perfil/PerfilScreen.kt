@@ -75,6 +75,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.core.R
+import com.example.core.utils.Device
+import com.example.core.utils.DeviceTracker
 import com.example.core.utils.ImageUtils
 import com.example.data.GestorSQLExternModern
 import com.example.data.UnsafeSSL
@@ -103,10 +105,12 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
 
             ImageUtils.guardarEnGaleria(context, imagenProcesada)
 
-            val uriLocal = ImageUtils.obtenerUriDeImagen(context, imagenProcesada)
-            perfil = perfil?.copy(foto = uriLocal.toString())
-
             coroutineScope.launch {
+                val uriLocal = withContext(Dispatchers.IO) {
+                    ImageUtils.obtenerUriDeImagen(context, imagenProcesada)
+                }
+                perfil = perfil?.copy(foto = uriLocal.toString())
+
                 val exitoSubida = withContext(Dispatchers.IO) {
                     ImageUtils.subirFotoAlServidor(dniPersona, bytes)
                 }
@@ -130,70 +134,81 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
 
 
     LaunchedEffect(dniPersona) {
-        withContext(Dispatchers.IO) {
-            try {
-                UnsafeSSL.ignoreSSLErrors()
-                val gestor = GestorSQLExternModern()
+        if (dniPersona.isEmpty()) {
+            error = "No se ha recibido el identificador del usuario"
+            isLoading = false
+            return@LaunchedEffect
+        }
 
-                val sessionManager = SecureSessionManager(context)
-                val token = sessionManager.getToken() ?: ""
+        isLoading = true
+        error = null
 
-                val response = gestor.connectarObjPOST(
+        try {
+            UnsafeSSL.ignoreSSLErrors()
+            val gestor = GestorSQLExternModern()
+
+            val sessionManager = SecureSessionManager(context)
+            val token = sessionManager.getToken() ?: ""
+
+            val tracker = DeviceTracker(context)
+            val userAgentHash = tracker.getUserAgentHash()
+
+            val response = withContext(Dispatchers.IO) {
+                gestor.connectarObjPOST(
                     "http://10.0.2.2/get_perfil.php",
-                    "token=$token&dni_persona=$dniPersona"
+                    "token=$token&dni_persona=$dniPersona&user_agent_hash=$userAgentHash"
                 )
+            }
 
-                if (response == null) {
-                    error = gestor.lastError ?: context.getString(R.string.profile_err_no_server_response)
+            if (response == null) {
+                error = gestor.lastError ?: context.getString(R.string.profile_err_no_server_response)
+            } else {
+                if (response.optBoolean("expired", false)) {
+                    val mensajeServidor = response.optString("error", null)
+
+                    withContext(Dispatchers.Main) {
+                        val deviceHandler = Device(context, sessionManager)
+                        deviceHandler.forzarReLogin(mensajeServidor)
+                    }
+                    return@LaunchedEffect
+                }
+
+                val newToken = response.optString("new_token", "")
+                if (newToken.isNotEmpty()) {
+                    sessionManager.saveSession(newToken, dniPersona)
+                }
+
+                if (response.has("error") && !response.isNull("error")) {
+                    error = response.getString("error")
                 } else {
-                    val newToken = response.optString("new_token", "")
-                    if (newToken.isNotEmpty()) {
-                        sessionManager.saveSession(newToken, dniPersona)
-                    }
+                    val datosJson = response.optJSONObject("datos")
 
-                    if (response.optBoolean("expired", false)) {
-                        sessionManager.logout()
+                    if (datosJson != null) {
+                        val asigJson = response.optJSONArray("asignaturas") ?: JSONArray()
+                        val listaAsignaturas = mutableListOf<String>()
 
-                        val intent = Intent().apply {
-                            setClassName(context.packageName, "com.example.loginframe.MainActivity")
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        for (i in 0 until asigJson.length()) {
+                            listaAsignaturas.add(asigJson.getString(i))
                         }
-                        context.startActivity(intent)
-                        return@withContext
-                    }
 
-                    if (response.has("error") && !response.isNull("error")) {
-                        error = response.getString("error")
+                        perfil = PerfilData(
+                            nombre = datosJson.optString("nom", "Desconocido"),
+                            apellidos = datosJson.optString("cognom", "Desconocido"),
+                            nia = datosJson.optInt("nia", 0),
+                            grupo = datosJson.optString("grupo", "Sin grupo").takeIf { it.isNotBlank() && it != "null" } ?: "Sin grupo",
+                            aula = datosJson.optString("aula", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "N/A",
+                            foto = datosJson.optString("foto", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "Sin foto",
+                            asignaturas = listaAsignaturas
+                        )
                     } else {
-                        val datosJson = response.optJSONObject("datos")
-
-                        if (datosJson != null) {
-                            val asigJson = response.optJSONArray("asignaturas") ?: JSONArray()
-                            val listaAsignaturas = mutableListOf<String>()
-
-                            for (i in 0 until asigJson.length()) {
-                                listaAsignaturas.add(asigJson.getString(i))
-                            }
-
-                            perfil = PerfilData(
-                                nombre = datosJson.optString("nom", "Desconocido"),
-                                apellidos = datosJson.optString("cognom", "Desconocido"),
-                                nia = datosJson.optInt("nia", 0),
-                                grupo = datosJson.optString("grupo", "Sin grupo").takeIf { it.isNotBlank() && it != "null" } ?: "Sin grupo",
-                                aula = datosJson.optString("aula", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "N/A",
-                                foto = datosJson.optString("foto", "N/A").takeIf { it.isNotBlank() && it != "null" } ?: "Sin foto",
-                                asignaturas = listaAsignaturas
-                            )
-                        } else {
-                            error = context.getString(R.string.profile_err_no_data_found)
-                        }
+                        error = context.getString(R.string.profile_err_no_data_found)
                     }
                 }
-            } catch (e: Exception) {
-                error = "Excepción: ${e.message}"
-            } finally {
-                isLoading = false
             }
+        } catch (e: Exception) {
+            error = "Excepción: ${e.message}"
+        } finally {
+            isLoading = false
         }
     }
 

@@ -49,6 +49,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.core.R
+import com.example.core.utils.DeviceTracker
 
 val Blue600 = Color(0xFF2563EB)
 val Slate800 = Color(0xFF1E293B)
@@ -163,11 +164,16 @@ fun LoginButton(
                     val baseUrl = "http://10.0.2.2"
                     val u = URLEncoder.encode(user, "UTF-8")
                     val p = URLEncoder.encode(pass, "UTF-8")
+
+                    val tracker = DeviceTracker(context)
+                    val userAgentHash = tracker.getUserAgentHash()
+                    val uah = URLEncoder.encode(userAgentHash, "UTF-8")
+
                     val gestor = GestorSQLExternModern()
 
                     val obj: JSONObject? = gestor.connectarObjPOST(
                         "$baseUrl/login.php",
-                        "user=$u&pass=$p"
+                        "user=$u&pass=$p&user_agent_hash=$uah"
                     )
 
                     (context as? ComponentActivity)?.runOnUiThread {

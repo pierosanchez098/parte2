@@ -53,6 +53,8 @@ import org.json.JSONObject
 import kotlin.jvm.java
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.example.core.utils.Device
+import com.example.core.utils.DeviceTracker
 
 @Composable
 fun EstudiesScreen(
@@ -85,25 +87,32 @@ fun EstudiesScreen(
             val sessionManager = SecureSessionManager(context)
             val token = sessionManager.getToken() ?: ""
 
+            val tracker = DeviceTracker(context)
+            val userAgentHash = tracker.getUserAgentHash()
+
             val jsonResponse: JSONObject? = withContext(Dispatchers.IO) {
-                gestor.connectarObjPOST("$baseUrl/get_estudis.php", "token=$token&dni_persona=$dniPersona")
+                gestor.connectarObjPOST(
+                    "$baseUrl/get_estudis.php",
+                    "token=$token&dni_persona=$dniPersona&user_agent_hash=$userAgentHash"
+                )
             }
 
             if (jsonResponse == null) {
                 errorMessage = gestor.lastError ?: context.getString(com.example.core.R.string.studies_err_no_server_response)
             } else {
+                if (jsonResponse.optBoolean("expired", false)) {
+                    val mensajeServidor = jsonResponse.optString("error", null)
+
+                    withContext(Dispatchers.Main) {
+                        val deviceHandler = Device(context, sessionManager)
+                        deviceHandler.forzarReLogin(mensajeServidor)
+                    }
+                    return@LaunchedEffect
+                }
+
                 val newToken = jsonResponse.optString("new_token", "")
                 if (newToken.isNotEmpty()) {
                     sessionManager.saveSession(newToken, dniPersona)
-                }
-                if (jsonResponse.optBoolean("expired", false)) {
-                    sessionManager.logout()
-                    val intent = Intent().apply {
-                        setClassName(context.packageName, "com.example.loginframe.MainActivity")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    context.startActivity(intent)
-                    return@LaunchedEffect
                 }
 
                 if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
