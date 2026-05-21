@@ -1,5 +1,6 @@
 package com.example.loginframe
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -34,13 +36,13 @@ class MenuActivity : AppCompatActivity() {
 
 
         setContent {
-
+            val context = LocalContext.current
             var currentScreenTitle by remember { mutableStateOf("Inicio") }
 
 
             var fragmentActual by remember { mutableStateOf<Fragment>(HomeFragment()) }
 
-            var isDarkMode by remember { mutableStateOf(false) }
+            var isDarkMode by remember { mutableStateOf(leerPreferenciaTema(context)) }
 
             LoginFrameTheme(darkTheme = isDarkMode) {
                 AppDrawerScaffold(
@@ -52,6 +54,7 @@ class MenuActivity : AppCompatActivity() {
 
                     onThemeChanged = { nuevoValor ->
                         isDarkMode = nuevoValor
+                        guardarPreferenciaTema(context, nuevoValor)
                     },
 
                     onMenuOptionClicked = { titulo ->
@@ -136,6 +139,16 @@ class MenuActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    private fun guardarPreferenciaTema(context: Context, isDark: Boolean) {
+        val prefs = context.getSharedPreferences("AppConfigPrefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("PREF_DARK_MODE", isDark).apply()
+    }
+
+    private fun leerPreferenciaTema(context: Context): Boolean {
+        val prefs = context.getSharedPreferences("AppConfigPrefs", Context.MODE_PRIVATE)
+        return prefs.getBoolean("PREF_DARK_MODE", false)
     }
 }
 
