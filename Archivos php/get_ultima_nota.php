@@ -7,12 +7,13 @@ include 'seguridad.php';
 $conn = new mysqli("localhost", "root", "", "plataforma_evalis");
 
 if ($conn->connect_error) {
-    echo json_encode(["error" => "Error de conexión a la BD", "ultima_nota" => null]);
+    echo json_encode(["error" => "Error de conexión a la BD", "ultima_nota" => null, "expired" => false]);
     exit;
 }
 
 $token = $_POST['token'] ?? $_GET['token'] ?? '';
 $dni_persona = $_POST['dni_persona'] ?? $_GET['dni_persona'] ?? '';
+$user_agent_hash_recibido = $_POST['user_agent_hash'] ?? $_GET['user_agent_hash'] ?? '';
 
 if (empty($token) || empty($dni_persona)) {
     echo json_encode(["error" => "Faltan token o dni_persona", "ultima_nota" => null, "expired" => true]);
@@ -22,7 +23,11 @@ if (empty($token) || empty($dni_persona)) {
 $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
-    echo json_encode(["error" => "Sesión expirada o inválida", "ultima_nota" => null, "expired" => true]);
+    echo json_encode([
+        "error" => $resultado['motivo'] ?? "Sesión expirada o inválida", 
+        "ultima_nota" => null, 
+        "expired" => true
+    ]);
     $conn->close();
     exit;
 }

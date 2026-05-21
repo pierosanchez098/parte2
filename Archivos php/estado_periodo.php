@@ -6,11 +6,19 @@ include 'seguridad.php';
 $conn = new mysqli("localhost", "root", "", "plataforma_evalis");
 
 $token = $_POST['token'] ?? '';
+$user_agent_hash_recibido = $_POST['user_agent_hash'] ?? '';
 
 $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
-    echo json_encode(["error" => "Sesión inválida", "expired" => true]);
+    echo json_encode([
+        "error" => $resultado['motivo'] ?? "Sesión expirada o inválida", 
+        "periodo_abierto" => false,
+        "expired" => true
+    ]);
+    if ($conn) {
+        $conn->close();
+    }
     exit;
 }
 

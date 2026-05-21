@@ -7,22 +7,28 @@ include 'seguridad.php';
 $conn = new mysqli("localhost", "root", "", "plataforma_evalis");
 
 if ($conn->connect_error) {
-    echo json_encode(["error" => "Error de conexión", "expired" => false]);
+    echo json_encode(["error" => "Error de conexión", "datos" => null, "asignaturas" => [], "expired" => false]);
     exit;
 }
 
 $token = $_POST['token'] ?? $_GET['token'] ?? '';
 $dni_persona = $_POST['dni_persona'] ?? $_GET['dni_persona'] ?? '';
+$user_agent_hash_recibido = $_POST['user_agent_hash'] ?? $_GET['user_agent_hash'] ?? '';
 
 if (empty($token) || empty($dni_persona)) {
-    echo json_encode(["error" => "Faltan token o dni_persona", "expired" => true]);
+    echo json_encode(["error" => "Faltan token o dni_persona", "datos" => null, "asignaturas" => [], "expired" => true]);
     exit;
 }
 
 $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
-    echo json_encode(["error" => "Sesión expirada o inválida", "expired" => true]);
+    echo json_encode([
+        "error" => $resultado['motivo'] ?? "Sesión expirada o inválida", 
+        "datos" => null, 
+        "asignaturas" => [], 
+        "expired" => true
+    ]);
     $conn->close();
     exit;
 }
@@ -70,7 +76,12 @@ while ($row = $result->fetch_assoc()) {
 }
 
 if ($perfil === null) {
-    echo json_encode(["error" => "No se encontró el perfil"]);
+    echo json_encode([
+        "error" => "No se encontró el perfil",
+        "datos" => null,
+        "asignaturas" => [],
+        "expired" => false
+    ]);
 } else {
     echo json_encode([
         "error" => null,

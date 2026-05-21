@@ -13,6 +13,7 @@ if ($conn->connect_error) {
 
 $token = $_POST['token'] ?? $_GET['token'] ?? '';
 $dni_persona = $_POST['dni_persona'] ?? $_GET['dni_persona'] ?? '';
+$user_agent_hash_recibido = $_POST['user_agent_hash'] ?? $_GET['user_agent_hash'] ?? '';
 
 if (empty($token) || empty($dni_persona)) {
     echo json_encode([
@@ -27,7 +28,7 @@ $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
     echo json_encode([
-        "error" => "Sesión expirada o inválida",
+        "error" => $resultado['motivo'] ?? "Sesión expirada o inválida",
         "notas" => [],
         "expired" => true
     ]);

@@ -11,7 +11,7 @@ $abrir  = filter_var($_POST['abrir'] ?? '', FILTER_VALIDATE_BOOLEAN);
 $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
-    echo json_encode(["error" => "Sesión inválida", "expired" => true]);
+    echo json_encode(["error" => $resultado['motivo'] ?? "Sesión expirada o inválida", "expired" => true]);
     exit;
 }
 

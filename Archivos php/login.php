@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 $username = $_REQUEST["user"] ?? "";
 $password = $_REQUEST["pass"] ?? "";
 $ip_address = $_SERVER['REMOTE_ADDR'];
-$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? "unknown";
+$user_agent_hash = $_REQUEST["user_agent_hash"] ?? "unknown";
 
 if ($username === "" || $password === "") {
     echo json_encode(["pot_entrar" => false, "tipus_derror" => "Falten camps"]);
@@ -43,7 +43,7 @@ if ($user_data && password_verify($password, $user_data['password_hash'])) {
         INSERT INTO sessions (token_hash, username, ip_address, user_agent, session_start, last_activity) 
         VALUES (?, ?, ?, ?, NOW(), NOW())
     ");
-    $stmt_sess->bind_param("ssss", $token_hash, $username, $ip_address, $user_agent);
+    $stmt_sess->bind_param("ssss", $token_hash, $username, $ip_address, $user_agent_hash);
     $stmt_sess->execute();
 }
 

@@ -7,12 +7,13 @@ include 'seguridad.php';
 $conn = new mysqli("localhost", "root", "", "plataforma_evalis");
 
 if ($conn->connect_error) {
-    echo json_encode(["error" => "Error de conexión", "aula" => null, "professors" => []]);
+    echo json_encode(["error" => "Error de conexión", "aula" => null, "professors" => [], "expired" => false]);
     exit;
 }
 
 $token = $_POST['token'] ?? $_GET['token'] ?? '';
 $dni_persona = $_POST['dni_persona'] ?? $_GET['dni_persona'] ?? '';
+$user_agent_hash_recibido = $_POST['user_agent_hash'] ?? $_GET['user_agent_hash'] ?? '';
 
 if (empty($token) || empty($dni_persona)) {
     echo json_encode(["error" => "Faltan token o dni_persona", "aula" => null, "professors" => [], "expired" => true]);
@@ -22,7 +23,12 @@ if (empty($token) || empty($dni_persona)) {
 $resultado = verificar_y_rotar_token($conn, $token);
 
 if (!$resultado['valido']) {
-    echo json_encode(["error" => "Sesión expirada o inválida", "aula" => null, "professors" => [], "expired" => true]);
+    echo json_encode([
+        "error" => $resultado['motivo'] ?? "Sesión expirada o inválida", 
+        "aula" => null, 
+        "professors" => [], 
+        "expired" => true
+    ]);
     $conn->close();
     exit;
 }
@@ -91,7 +97,7 @@ while ($row = $result->fetch_assoc()) {
     if ($row['assignatures_impartides']) {
         $currentProf["assignatures"] = array_merge(
             $currentProf["assignatures"],
-            explode(' | ', $row['assignatures_impartides'])
+            $currentProf["assignatures"] = explode(' | ', $row['assignatures_impartides'])
         );
     }
 }
