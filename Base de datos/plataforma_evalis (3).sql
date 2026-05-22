@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 22-05-2026 a las 11:52:18
+-- Tiempo de generación: 23-05-2026 a las 00:52:47
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -290,24 +290,25 @@ CREATE TABLE `centre` (
   `id_centre` int(11) NOT NULL,
   `nom` varchar(150) NOT NULL,
   `direccio` varchar(255) DEFAULT NULL,
-  `pla` set('nou','antic') NOT NULL
+  `pla` set('nou','antic') NOT NULL,
+  `logo` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `centre`
 --
 
-INSERT INTO `centre` (`id_centre`, `nom`, `direccio`, `pla`) VALUES
-(1, 'IES Joan Oró', 'Carrer de l\'Escola Industrial, 27 – 08980 Sant Feliu de Llobregat', 'nou'),
-(2, 'IES La Bastida', 'Avinguda de la Via Augusta, 101 – 08172 Sant Cugat del Vallès', 'nou'),
-(3, 'Institut Eugeni d\'Ors', 'Carrer de Sant Joan, 10 – 08720 Vilafranca del Penedès', 'nou'),
-(4, 'IES Manuel de Cabanyes', 'Passeig de la Ribera, 45 – 08870 Sitges', 'nou'),
-(5, 'Institut Thos i Codina', 'Carrer de l\'Església, 15 – 08301 Mataró', 'nou'),
-(6, 'IES Barri Besòs', 'Carrer d\'Alfons XII, 13 – 08911 Badalona', 'nou'),
-(7, 'Institut Vilatzara', 'Carrer Major, 56 – 08729 Viladecavalls', 'nou'),
-(8, 'IES Castellbisbal', 'Avinguda Pau Casals, 12 – 08755 Castellbisbal', 'nou'),
-(9, 'Institut Voltrera', 'Carrer del Sol, 8 – 08785 Vallirana', 'nou'),
-(10, 'IES El Cairat', 'Camí del Mig, 44 – 08292 Esparreguera', 'nou');
+INSERT INTO `centre` (`id_centre`, `nom`, `direccio`, `pla`, `logo`) VALUES
+(1, 'IES Joan Oró', 'Carrer de l\'Escola Industrial, 27 – 08980 Sant Feliu de Llobregat', 'nou', NULL),
+(2, 'IES La Bastida', 'Avinguda de la Via Augusta, 101 – 08172 Sant Cugat del Vallès', 'nou', NULL),
+(3, 'Institut Eugeni d\'Ors', 'Carrer de Sant Joan, 10 – 08720 Vilafranca del Penedès', 'nou', NULL),
+(4, 'Universidad Santa María', 'Avenida de las Ciencias 404', 'antic', './uploads/logos/logo_centro_4.png'),
+(5, 'Institut Thos i Codina', 'Carrer de l\'Església, 15 – 08301 Mataró', 'nou', NULL),
+(6, 'IES Barri Besòs', 'Carrer d\'Alfons XII, 13 – 08911 Badalona', 'nou', NULL),
+(7, 'Institut Vilatzara', 'Carrer Major, 56 – 08729 Viladecavalls', 'nou', NULL),
+(8, 'IES Castellbisbal', 'Avinguda Pau Casals, 12 – 08755 Castellbisbal', 'nou', NULL),
+(9, 'Institut Voltrera', 'Carrer del Sol, 8 – 08785 Vallirana', 'nou', NULL),
+(10, 'Instituto Politécnico Evalis', 'Avenida de las Ciencias 404', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -546,7 +547,7 @@ CREATE TABLE `estado_evaluacion` (
 --
 
 INSERT INTO `estado_evaluacion` (`id`, `periodo_abierto`, `ultima_modificacion`, `modificado_por`) VALUES
-(1, 1, '2026-05-22 10:51:38', NULL);
+(1, 1, '2026-05-22 11:56:24', NULL);
 
 -- --------------------------------------------------------
 
@@ -805,6 +806,50 @@ INSERT INTO `estudiants_historia` (`id`, `nia`, `nom_camp`, `valor_nou`, `valor_
 (67, 313056, 'nota_UF_21', '9.00', '10.00', '2026-05-22 11:00:31', 'Modificació de nota: 10.00 → 9.00 | UF: Comunicació professional escrita (LLC02)'),
 (68, 313056, 'nota_UF_21', '10.00', '9.00', '2026-05-22 11:03:51', 'Modificació de nota: 9.00 → 10.00 | UF: Comunicació professional escrita (LLC02)'),
 (69, 313056, 'nota_UF_22', '10.00', '5.00', '2026-05-22 11:31:37', 'Modificació de nota: 5.00 → 10.00 | UF: Comunicació oral en català (LLC02)');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estudios_centre`
+--
+
+CREATE TABLE `estudios_centre` (
+  `id` int(11) NOT NULL,
+  `id_centre` int(11) NOT NULL,
+  `nom_estudio` varchar(150) NOT NULL,
+  `curso` varchar(9) DEFAULT '2025-2026'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `estudios_centre`
+--
+
+INSERT INTO `estudios_centre` (`id`, `id_centre`, `nom_estudio`, `curso`) VALUES
+(1, 1, 'CFGS Desarrollo de Aplicaciones Multiplataforma (DAM)', '2025-2026'),
+(2, 1, 'CFGS Desarrollo de Aplicaciones Web (DAW)', '2025-2026'),
+(3, 2, 'CFGS Administracion de Sistemas Informaticos en Red (ASIR)', '2025-2026'),
+(4, 2, 'CFGS Automatizacion y Robotica Industrial', '2025-2026'),
+(5, 3, 'CFGS Administracion y Finanzas', '2025-2026'),
+(6, 3, 'CFGS Asistencia a la Direccion', '2025-2026'),
+(9, 5, 'CFGS Marketing y Publicidad', '2025-2026'),
+(10, 5, 'CFGS Gestion de Ventas y Espacios Comerciales', '2025-2026'),
+(11, 6, 'CFGS Laboratorio Clinico y Biomedico', '2025-2026'),
+(12, 6, 'CFGS Anatomia Patologica y Citodiagnostico', '2025-2026'),
+(13, 7, 'CFGS Imagen para el Diagnostico y Medicina Nuclear', '2025-2026'),
+(14, 7, 'CFGS Dietetica', '2025-2026'),
+(15, 8, 'CFGS Educacion Infantil', '2025-2026'),
+(16, 8, 'CFGS Integracion Social', '2025-2026'),
+(17, 9, 'CFGS Animacion Sociocultural y Turistica', '2025-2026'),
+(18, 9, 'CFGS Guiado, Informacion y Asistencias Turisticas', '2025-2026'),
+(21, 10, 'Desarrollo de Aplicaciones Multiplataforma', '2025-2026'),
+(22, 10, 'Desarrollo de Aplicaciones Web', '2025-2026'),
+(23, 10, 'Administración de Sistemas Informáticos', '2025-2026'),
+(24, 10, 'Automatización y Robótica Industrial', '2025-2026'),
+(29, 4, 'Desarrollo de Aplicaciones Multiplataforma', '2025-2026'),
+(30, 4, 'Desarrollo de Aplicaciones Web', '2025-2026'),
+(31, 4, 'Administración de Sistemas Informáticos', '2025-2026'),
+(32, 4, 'Automatización y Robótica Industrial', '2025-2026'),
+(33, 4, 'Derechos Humanos', '2025-2026');
 
 -- --------------------------------------------------------
 
@@ -1322,7 +1367,57 @@ INSERT INTO `login_logs` (`id`, `login_timestamp`, `username`, `ip_direccio`, `l
 (113, '2026-05-22 10:55:17', 'tomeu.ramirez', '::1', 1),
 (114, '2026-05-22 10:57:29', 'elena.blanco', '::1', 1),
 (115, '2026-05-22 11:22:01', 'anna.rodriguez', '127.0.0.1', 1),
-(116, '2026-05-22 11:30:16', 'elena.blanco', '::1', 1);
+(116, '2026-05-22 11:30:16', 'elena.blanco', '::1', 1),
+(117, '2026-05-22 11:55:58', 'tomeu.ramirez', '::1', 1),
+(118, '2026-05-22 12:11:23', 'anna.rodriguez', '::1', 0),
+(119, '2026-05-22 12:11:47', 'anna.rodriguez', '::1', 1),
+(120, '2026-05-22 12:16:43', 'anna.rodriguez', '::1', 1),
+(121, '2026-05-22 12:17:11', 'anna.rodriguez', '::1', 1),
+(122, '2026-05-22 12:22:50', 'anna.rodriguez', '::1', 1),
+(123, '2026-05-22 12:23:10', 'maria.garcia', '::1', 1),
+(124, '2026-05-22 12:23:53', 'elena.blanco', '::1', 1),
+(125, '2026-05-22 12:24:11', 'tomeu.ramirez', '::1', 1),
+(126, '2026-05-22 13:07:26', 'anna.rodriguez', '::1', 1),
+(127, '2026-05-22 13:08:14', 'anna.rodriguez', '::1', 1),
+(128, '2026-05-22 13:18:23', 'anna.rodriguez', '::1', 1),
+(129, '2026-05-22 13:20:43', 'anna.rodriguez', '::1', 1),
+(130, '2026-05-22 14:10:56', 'elena.blanco', '::1', 1),
+(131, '2026-05-22 14:15:12', 'elena.blanco', '::1', 1),
+(132, '2026-05-22 14:20:58', 'elena.blanco', '::1', 1),
+(133, '2026-05-22 14:49:57', 'elena.blanco', '::1', 1),
+(134, '2026-05-22 14:50:42', 'anna.rodriguez', '::1', 1),
+(135, '2026-05-22 14:52:41', 'anna.rodriguez', '::1', 1),
+(136, '2026-05-22 14:52:58', 'elena.blanco', '::1', 1),
+(137, '2026-05-22 14:59:32', 'elena.blanco', '::1', 1),
+(138, '2026-05-22 15:05:34', 'elena.blanco', '::1', 1),
+(139, '2026-05-22 15:10:52', 'elena.blanco', '::1', 1),
+(140, '2026-05-22 15:18:38', 'elena.blanco', '::1', 1),
+(141, '2026-05-22 15:30:45', 'elena.blanco', '::1', 0),
+(142, '2026-05-22 15:30:49', 'elena.blanco', '::1', 1),
+(143, '2026-05-22 15:36:18', 'elena.blanco', '::1', 1),
+(144, '2026-05-22 16:23:07', 'anna.rodriguez', '::1', 1),
+(145, '2026-05-22 16:26:09', 'anna.rodriguez', '::1', 1),
+(146, '2026-05-22 16:36:36', 'anna.rodriguez', '::1', 1),
+(147, '2026-05-22 17:15:56', 'elena.blanco', '::1', 0),
+(148, '2026-05-22 17:15:59', 'elena.blanco', '::1', 1),
+(149, '2026-05-22 18:38:13', 'tomeu.ramirez', '::1', 1),
+(151, '2026-05-22 18:41:01', 'tomeu.ramirez', '::1', 1),
+(152, '2026-05-22 18:45:13', 'tomeu.ramirez', '::1', 1),
+(153, '2026-05-22 18:46:45', 'tomeu.ramirez', '::1', 1),
+(154, '2026-05-22 18:47:30', 'tomeu.ramirez', '::1', 1),
+(155, '2026-05-22 18:50:10', 'tomeu.ramirez', '::1', 1),
+(156, '2026-05-22 19:09:38', 'tomeu.ramirez', '::1', 1),
+(157, '2026-05-22 19:16:15', 'tomeu.ramirez', '::1', 1),
+(158, '2026-05-22 19:22:21', 'tomeu.ramirez', '::1', 1),
+(159, '2026-05-22 22:10:19', 'maria.garcia', '::1', 1),
+(160, '2026-05-22 22:30:46', 'maria.garcia', '::1', 1),
+(161, '2026-05-22 23:03:25', 'maria.garcia', '::1', 1),
+(162, '2026-05-23 00:05:38', 'maria.garcia', '::1', 1),
+(163, '2026-05-23 00:07:51', 'maria.garcia', '::1', 1),
+(164, '2026-05-23 00:14:21', 'maria.garcia', '::1', 1),
+(165, '2026-05-23 00:15:02', 'maria.garcia', '::1', 1),
+(166, '2026-05-23 00:20:03', 'maria.garcia', '::1', 1),
+(167, '2026-05-23 00:22:20', 'maria.garcia', '::1', 1);
 
 -- --------------------------------------------------------
 
@@ -1823,67 +1918,108 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('$2y$10$stu901...', 'margalida.crespi', '62.57.188.33', 'Chrome/119 (Android)', '2025-11-28 20:33:44', '2025-11-28 21:10:22', NULL),
 ('$2y$10$vwx234...', 'lidia.farre', '79.153.45.112', 'Firefox/118 (Windows)', '2025-11-28 20:45:01', '2025-11-28 21:05:11', NULL),
 ('$2y$10$yza567...', 'alba.vives', '87.123.45.67', 'Safari/17 (iPad)', '2025-11-28 21:30:22', '2025-11-28 22:00:00', NULL),
+('02edfd511225e408c8256d1573416235235f76525a111eb218a5878073202ced', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:15:12', '2026-05-22 14:15:27', NULL),
 ('037656267ad52120ad64d8b007dcfc3b9b09b84cbffd8428a966e42581127118', 'xavier.molins', '::1', 'unknown', '2026-05-06 14:16:51', '2026-05-06 14:16:51', NULL),
 ('059b875160def001011957416e2ec6fff7af5f7d7ce81d60c45902907ff1a691', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 00:07:41', '2026-05-06 01:50:18', '2026-05-06 01:50:18'),
+('0ac5445cec42d1487703cee9fc7ed1862b0ffcb10e793ea7b6f51fdb967f587f', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:30:49', '2026-05-22 15:33:12', NULL),
+('105c9abc85bf5eaa118f19a7749a9d7567f928d5da275c7034bec9413a7e564f', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 23:03:25', '2026-05-22 23:07:45', NULL),
 ('1115b16ca868c02d1d629acca36c107ddab3cf77513d27ea05cf7174abe9a5f6', 'elena.blanco', '::1', 'unknown', '2026-05-06 16:22:13', '2026-05-06 16:22:13', NULL),
+('1199709b9f4bc3b64329d563e788dc57f682b4f119962a2129ce362745ddc643', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:36:18', '2026-05-22 15:36:40', NULL),
 ('1732be8169444d1c0721b8b7a30cc27104a924d14edfee1662fc2af8798bb515', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 15:31:02', '2026-05-06 15:31:09', NULL),
 ('19196056abf67849faa9602a2cbc331adecce1f11b38067f2a59e5a49dfa066a', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 09:31:49', '2026-05-06 09:31:49', NULL),
+('1e6dc426b0b5ad4908929fd5ad175ca2d496d4b7d8f77605cd1e9540c39eb980', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:11:47', '2026-05-22 12:12:04', NULL),
+('2110d63830e1882d4e5c58097f4239040db3b690e897ae1a3d5874570467d846', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 13:07:26', '2026-05-22 13:07:26', NULL),
+('2127e807b836ebca6554beae7564d29744c81c816a6231353e7d3d2fb4b7bb86', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:46:45', '2026-05-22 18:46:48', NULL),
 ('244495825b2bdd0f34e944ee2cec7af5251e6d5322d1fed308b88dcf62ea50c8', 'xavier.molins', '::1', 'unknown', '2026-05-06 14:26:37', '2026-05-06 14:26:37', NULL),
 ('26378f86fb6cfe370a8a54f129ce5bf8c15e6b5c53e09ee92224a3375b29791c', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:22:55', '2026-05-06 12:22:55', NULL),
 ('26abbadacff7e79da9511ca0d441ec6f92df6e73ca23509388ef14a926891169', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 02:02:21', '2026-05-06 02:08:01', NULL),
 ('28cb96bc34ec76eeaf435b305edb5942fcd8a6e73ed827c3d569620809da6695', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:04:34', '2026-05-06 13:04:34', NULL),
 ('2903a10c6167fd3398198ef92be59fff0d8b7b911b4f133fe7a75702bd5565e2', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:53:45', '2026-05-06 13:53:45', NULL),
+('2cb98d2b22a829f4b9aa7f97f5a6941a34f4ea60a433c7e5133c74dde6cbd60a', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 22:10:19', '2026-05-22 22:12:22', NULL),
 ('2ddf68e1dc1bab3bb4a89a2fc11f2b64635ea7a49bd543e3ec6435ad7090df39', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 16:36:11', '2026-05-06 16:36:26', NULL),
+('2e985ff46f66d2553f870848d68cc3d289e01d4c701f1c07315b169b168857fd', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:10:52', '2026-05-22 15:10:52', NULL),
 ('3050ae8500dc6f5503119e9439afe8a3af574313271d9345df4cc81c954714f8', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:18:22', '2026-05-06 12:18:22', NULL),
+('32a65cdfa3ac0a86bc3cad85fa678eeb0606f7e8931404404beef1c27a9d89be', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:22:20', '2026-05-23 00:22:27', NULL),
+('32c9fdaea4df160c8ed3235a444dd7811b464050cd891a8506cb0c962b7d8132', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:50:42', '2026-05-22 14:50:45', NULL),
+('33664a6bf6d76c60fc5b3e189b154838a3a9dd716e1d54f822981239e332d199', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:05:38', '2026-05-23 00:05:41', NULL),
 ('3631ff3b4070a48fcf623dea49d4c3b63503caa49e8303e2ce19c61ab26f4ee6', 'anna.rodriguez', '::1', 'unknown', '2026-05-06 09:27:52', '2026-05-06 09:27:52', NULL),
 ('36d651fd18809089def18534d13befe6f8638f954e2f2de0bb427419dd539930', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 11:30:16', '2026-05-22 11:31:37', NULL),
 ('37affeb573e5b3ebbda760faeb42ba6b6f866274c229c560e09b80ad92b8aa60', 'maria.garcia', '::1', 'unknown', '2026-05-06 15:00:29', '2026-05-06 15:00:29', NULL),
+('3ac95fda9a1bf93346942e8692e7baad8ed0629489724941dce4b0118173ca75', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:16:43', '2026-05-22 12:16:47', NULL),
 ('40974cf8c1573a106afd7fc2eb8b537a8b30d9d08d3247cfd55eebccfd92b27c', 'maria.garcia', '::1', 'unknown', '2026-05-06 20:53:21', '2026-05-06 20:53:21', NULL),
+('441b6e536e8326f799d614bdcf0e3d6c713c884584a988a3c54e0d67a21b4ca6', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 11:55:58', '2026-05-22 11:56:26', NULL),
 ('44d9ce12b5913281f3bf8735c2b67a275b3aa081db921fcd684d855f3eda981b', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:45:19', '2026-05-06 13:45:19', NULL),
 ('493ba1b38f3c0a6db553f6d6fb2fd91dba6c85eb1f681264e670cebfbf12a60d', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:57:02', '2026-05-06 13:57:02', NULL),
 ('53a9753d9ce2978a7b461b988be69f9a8986e7a843fe07a30aa55ce8bfcdd0e8', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:13:40', '2026-05-06 10:13:40', NULL),
 ('565cd247cd039a712c8efa3b1d1d5f434a48016cf90e228ff2a18d676f742bd1', 'xavier.molins', '::1', 'unknown', '2026-05-06 14:21:29', '2026-05-06 14:21:29', NULL),
 ('56cedf434180064e5c5261004e82e65b9aa3d68a88596d3c4a918ef16070bc06', 'maria.garcia', '::1', 'unknown', '2026-05-06 15:06:27', '2026-05-06 15:06:27', NULL),
+('5a8c50ba305eaa079eb7ef6574ca3e3900e859aa4acb3c5bd71aef64672313a7', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:22:50', '2026-05-22 12:22:52', NULL),
+('5adc4d720c58522fc9563f6d6f6f11ee7e4932c8c049500ac8ffb165c58e7926', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:38:13', '2026-05-22 18:38:16', NULL),
 ('5f6b4cb93485d6c21d96a001e90b0d8b4c0b11f11a3909fb06b9c8b42baa5fa9', 'anna.rodriguez', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-05 23:58:02', '2026-05-05 23:58:02', NULL),
 ('6018d1a1c8b61644fc9385c588119613b6f2af664863edbee02212d2c7f5dd9e', 'nuria.torres', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 20:23:14', '2026-05-06 20:24:44', NULL),
 ('64053469ff404fe941739a9e4fd192463e2395d2e2e8206e8a1f5f2c2cc6e812', 'anna.rodriguez', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-06 09:17:07', '2026-05-06 09:17:07', NULL),
+('67b49da66119b8dc49d0b1b3ca0d5006a371da1ad4c577e947a162977d119b25', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 16:36:36', '2026-05-22 16:36:38', NULL),
 ('6989b4bb567bceb3c2ff0e4aebda0b407934bcf3c7282b20ebff17963229ab3f', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 10:55:17', '2026-05-22 10:57:12', NULL),
+('6a06f98bcf831b57c809d94cf17cad71b374f7a55a583ed2c14b3036d90e8af2', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:41:01', '2026-05-22 18:41:03', NULL),
 ('6c5b9561c7230b79d4b9a024072a48c41e7835442ed96ef0e52eaa1d53ccbf8d', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:34:41', '2026-05-06 10:34:41', NULL),
+('6f5e2e5400268d1ac5a06bf08d48a68fe3527e7857febd25211234a2f0b991f8', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:15:02', '2026-05-23 00:15:09', NULL),
+('772586a2dd92267c660d65490c29debaf226f6d6d2f35e35c7863860c853c5f8', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:20:58', '2026-05-22 14:20:58', NULL),
 ('7c9190e47fda1390f489da0c4d41f4c00903517f6a20dd5067e49687c0259862', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:04:53', '2026-05-06 13:04:53', NULL),
 ('7cdbcb173434bcc9f58b5e871a0266b5f4fb0f15e724364f317578fc854a601d', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 19:06:54', '2026-05-06 19:07:07', NULL),
+('81247277cf2debefe6d8813c9dbc4b851295ab851a2303ad780a464de9128de3', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:52:41', '2026-05-22 14:52:44', NULL),
 ('812fa36c0a28881f489ae1b70dbd61cac4bb885e4eb8df554165ea09e95d758f', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 14:05:17', '2026-05-06 14:05:17', NULL),
 ('83964c8f7c851ee94b97ed221601552e153fc9888eb05f360406d54a7ec60d92', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 01:58:22', '2026-05-06 02:00:09', '2026-05-06 02:00:09'),
 ('84c1958fdca509330a123e999f781f080c071bb853b871c20b064b7811ff01d4', 'maria.garcia', '::1', 'unknown', '2026-05-06 16:09:52', '2026-05-06 16:09:52', NULL),
 ('8a4d2385a46e74a68ee035a9def154e90b12a601e496c909b69f916bf215b614', 'maria.garcia', '::1', 'unknown', '2026-05-06 16:12:00', '2026-05-06 16:12:00', NULL),
 ('8ae2d749cd22b7149fa798d49b3b93a0700710437c9635f40d542cb27a7b0fe2', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 18:43:42', '2026-05-06 18:52:29', NULL),
 ('8c4893ed53292d1f074e1b1cd1c4f64dd8bbcc1f949f114f7d4904bf0cef4df0', 'elena.blanco', '::1', 'unknown', '2026-05-06 14:12:48', '2026-05-06 14:12:48', NULL),
+('8ce2533979e4dc89a7cd8a8afb1046a187afb5dc550fa5f5dc9ff0c049dc68a6', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:23:53', '2026-05-22 12:23:55', NULL),
+('8f16b4a1527b5c6494cae81962f7ff2430a98e692182537336493cea5fbad11a', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 13:18:23', '2026-05-22 13:18:26', NULL),
 ('91e532bcf6017f8a20cdcd8f712b7a70f6fad5b8b5f9dd25777bf9b070f79d2e', 'xavier.molins', '::1', 'unknown', '2026-05-06 19:25:30', '2026-05-06 19:25:30', NULL),
 ('92688e70ef249fdefb70bcc510e9ad68786df1aaecd233f47419b84be65b3c5f', 'anna.rodriguez ', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 04:58:49', '2026-05-06 04:58:49', NULL),
 ('9335adf373813acb77a64cdddfb3fb2ce6e67bbad651fc0f26ea7378e0c283f7', 'elena.blanco', '::1', 'unknown', '2026-05-06 20:51:03', '2026-05-06 20:51:03', NULL),
 ('93c08850c505e498ab6522069065a4247daaabd003424f62490a5852ab3ed9ea', 'maria.garcia', '::1', 'unknown', '2026-05-06 19:37:56', '2026-05-06 19:37:56', NULL),
 ('9417a6db3ac96ad63e651014cae37a71fb9714cbc6156c7385f6f97538073e2a', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 20:45:14', '2026-05-06 20:50:28', NULL),
+('971cd2c07d533cb4618db507308d8b099bbceb42cf7aed992c792051f363de41', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:59:32', '2026-05-22 14:59:32', NULL),
 ('979c6e6e56ff5d0082f949811cac96f177017876c58274e4333eefd741408a1d', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:19:42', '2026-05-06 12:19:42', NULL),
 ('99de0d8a19ab5110f532666ddf27c0d5db9d6f3df0a4a05ad0b136abfac75d87', 'elena.blanco', '::1', 'unknown', '2026-05-06 16:21:05', '2026-05-06 16:21:05', NULL),
 ('9a2ea64128fac6e80b973f0579ed1a9e3b4fd33a5451c49729f95b0384955993', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 10:51:25', '2026-05-22 10:51:52', NULL),
 ('9b660b6422c1f60e02a4910a0374a5a5814ce8b14420a791de1adcc454b59056', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 09:58:51', '2026-05-06 09:58:54', NULL),
 ('9b84e4cb236eb1ef85bd6d527bd91a0080935e3e103cd89c83dae909969ef81e', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:58:59', '2026-05-06 10:58:59', NULL),
 ('9ce878d841b3f8187aa26ab99277cb427de33d0ec3fad40bec64cc599cdda2b1', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:43:45', '2026-05-06 13:43:45', NULL),
+('9d813ef5e86336f60eddddb291787cd093db820c29f5c21cfd95b0d08592b586', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:10:56', '2026-05-22 14:10:56', NULL),
 ('9f29de6e060e8d003af9d61c3821dbf220ca9c02ccf06149c0ced583d9ff6775', 'maria.garcia', '::1', 'unknown', '2026-05-06 15:10:39', '2026-05-06 15:10:39', NULL),
+('9f98ccc8c418c4d674cf306eea428df59487f8b020361956cb0077fa28782955', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:45:13', '2026-05-22 18:45:16', NULL),
 ('a098bd47610ddc188a1774ea99a20a41c3aed823d0dbda840515b7038d42892a', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 15:12:37', '2026-05-06 15:13:47', NULL),
 ('a2c16bce95680bc7c84c3827f73da35f4f1582f84d44d1609eb88a5e2a6ec304', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 11:01:33', '2026-05-06 11:01:33', NULL),
 ('a4383be43c66b0ed77c95ec6b36c2afd9ef3c31dc5b83194dc8bb96430f2aa49', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:05:40', '2026-05-06 13:05:40', NULL),
 ('a6e53628bd2dc8cd49fbbecd2e29263ecd716c216f6a9ceef0933b8dbf26f5e6', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:14:11', '2026-05-06 13:14:11', NULL),
+('a7a718aac3dfb9cbc0764da05c0516f24eb856e1e79d91c9250a38ae087a891c', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:17:11', '2026-05-22 12:17:11', NULL),
 ('a853de637cb534ef9bd04c4cab0478edc0ae93ad59780c0eaa3bf5e2f5543a3b', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 01:53:07', '2026-05-06 01:58:07', '2026-05-06 01:58:07'),
+('a91b2d258b3f2295dac293fe89b535db5fa7414219547b46ce68e0e9d0452431', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 13:20:43', '2026-05-22 13:20:45', NULL),
 ('ae2b9e4dafad82f790ecd619719d1b1a668414317a7eee764ad10138460c96eb', 'elena.blanco', '::1', 'unknown', '2026-05-06 14:42:50', '2026-05-06 14:42:50', NULL),
 ('b173fb5d4eb5c23c6213c8e829d79e8e00d477da22bb1cedc69f667d4f23a245', 'anna.rodriguez', '127.0.0.1', '771794427', '2026-05-22 10:38:42', '2026-05-22 11:21:18', NULL),
+('b1e14aa1109fc5e0a2f9ad53f0bb1590d0fb145a1ab1a41c6cbbffb5a42d818c', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 16:26:09', '2026-05-22 16:29:33', NULL),
+('b3c31d1097fc469ec482e924b8ef575e852ad783989f5dbee7df29f708f5e0ab', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:52:58', '2026-05-22 14:52:58', NULL),
 ('b44560637d6c4b8ccc93cf489977f2032edc5e0420411b9ee508eb7c9c5db135', 'xavier.molins', '::1', 'unknown', '2026-05-06 19:22:24', '2026-05-06 19:22:24', NULL),
 ('b50bdd94b35191db30dac9c20b21e319fb9e5a11a1a88e41c7133f007fa05894', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:02:33', '2026-05-06 13:02:33', NULL),
 ('ba8a0b37d2248ebbde6e576382f6c9fcf23a84df8ba57d08ae620de2ce65c3ff', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:01:39', '2026-05-06 10:01:42', NULL),
+('bcf0c01d4d0d54200ce50e05bf52f847bb992fa7851336fd526f75106a750135', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:05:34', '2026-05-22 15:05:34', NULL),
 ('bd26b40df8d95b164857d9f22c1d66936b3c4708ad07f7ddb8d928cbfa0c6c62', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:51:58', '2026-05-06 13:51:58', NULL),
 ('bd76ca3393f708346ccc52d6d45ba79b63d4f5e5434e689dd3a3d673714fad3b', 'anna.rodriguez', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-05 23:48:19', '2026-05-05 23:48:19', NULL),
+('bdccf0b6fd63c1fcfab4547b65222927c6ac980dc526e85c55cb8cc29752e863', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 17:15:59', '2026-05-22 17:16:43', NULL),
 ('bfc1d03999c8b11c04229ff68745f07b9077ba3d941a631c228ad1f9a41ea3ee', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:41:36', '2026-05-06 10:41:36', NULL),
 ('c09ebfa7cfab0f7df684df1a954cfcd13b3d03812f08ee7009efa12b0ee38a5e', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:49:54', '2026-05-06 13:49:54', NULL),
+('c24883bcf7a422f483aea900f2821c561e66c1b39fbc32e843fde7077c12a1ae', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 22:30:46', '2026-05-22 22:30:59', NULL),
+('c282ee72729042ffdd6d8f4daed50c565d89ee83241cef18b2f9c1d986ffd7b7', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 19:09:38', '2026-05-22 19:09:46', NULL),
 ('c821931c31178595e4b8aa1948b093319a0bedb15400e8a2969751555b157e6d', 'elena.blanco', '::1', 'unknown', '2026-05-06 19:33:39', '2026-05-06 19:33:39', NULL),
+('c97274f3ccc144c28200854d79eedbc5dfb1bb6eb711c17a97eb63ddb64ca50e', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 19:22:21', '2026-05-22 19:39:09', NULL),
+('cb38e75a313e79136422cf24d0b0d8b5faed5e020f35e2ba1302640f80de6253', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 16:23:07', '2026-05-22 16:23:07', NULL),
+('cd3d03301e20d66f17b45e71712735df072a19937a96f2f8ce7a49e0056738e7', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:47:30', '2026-05-22 18:47:58', NULL),
+('d617ccd1b111e43deb366fbaa13452304aa14f9302ee97c5780992bafddd6018', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 18:50:10', '2026-05-22 18:55:45', NULL),
+('d6e91b36cfcb55f3b3d0bbc58cf0aa2d5f7ba76efe647207e1d5cdbbf3ea7037', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:18:38', '2026-05-22 15:18:38', NULL),
+('d7ad415241ec93416954dcb630dffa925b08ee0939adf379148f0c91f4caea71', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 19:16:15', '2026-05-22 19:16:20', NULL),
+('d7c5fc4faa0c55929f6cea0f9b675f852aae3f76add9f994c606fe1bac3e9219', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:14:21', '2026-05-23 00:14:34', NULL),
 ('d7ece451d22f26d8a773ec0bdd41022c010af816c7cfb66b75c0988cfabb833b', 'anna.rodriguez', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-05 23:57:34', '2026-05-05 23:57:34', NULL),
 ('d80947c20ae3c49553d45ea26e6bad51459cb20ef5d06d48996bd178eacde5bf', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 02:08:38', '2026-05-06 02:08:41', NULL),
 ('dba12085d9d3f036245290b1b33ab07ea039dfd02251ce2a11b6289c6f6f3f46', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 04:55:24', '2026-05-06 04:55:24', NULL),
@@ -1893,9 +2029,15 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('e05b9a2c1591cf7236811659b4f0bc7227b83fb9be9f44a92c2463647eee9c2a', 'anna.rodriguez', '127.0.0.1', '771794427', '2026-05-22 11:22:01', '2026-05-22 11:50:40', NULL),
 ('e4efae91e39821deb805b3da45342a15a61d49451dd9c09dc4f0def5b0825638', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:29:42', '2026-05-06 12:29:42', NULL),
 ('e7f049164cb12da1e012e7bb8d505f9a4fccd13f22f12cf7376d0920cc225073', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 09:13:57', '2026-05-06 09:14:03', NULL),
+('e9767054095c4453ffea6c2ec177e9eeb22621d8673f0f74b5f8d9989a3b5e7c', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:24:11', '2026-05-22 12:24:19', NULL),
 ('eaad3230bf5554013af334fa712968a227ad4ca01a587c85c6ed3b085688dffe', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 05:21:16', '2026-05-06 05:22:42', NULL),
+('eba237271350e5152270a2e4a22e5e6ef3758753a97620e6c2893edc2ffa15aa', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:23:10', '2026-05-22 12:23:23', NULL),
+('f616eca69fd81b8f2f79fd1091473b80fe8e061e2dbe06cb336d94139e32eaa6', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:49:57', '2026-05-22 14:49:57', NULL),
+('f864e801c7ebd147ef79402f32a3d1a3dd9e0ec41b1b0c5fd4e54666b0db9f0a', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 13:08:14', '2026-05-22 13:08:14', NULL),
 ('f88ccb65efff7fd31e9d314d658ecfa002d9af8a7a4cf7b2a23613770c80250c', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:06:03', '2026-05-06 10:06:05', NULL),
-('fdd68ed531cf7b79a4818336a3f25a35d77e66eec284838d4a9821bca33139ab', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:08:42', '2026-05-06 10:08:45', NULL);
+('fa231583c3318ffd6a36f257abd69984ca440acea5142ae8c3991920f3c40080', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:07:51', '2026-05-23 00:07:59', NULL),
+('fdd68ed531cf7b79a4818336a3f25a35d77e66eec284838d4a9821bca33139ab', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 10:08:42', '2026-05-06 10:08:45', NULL),
+('fe58cd165d8c246cc8fb7ff6383e1854a6f1b8c8db1d9f1623a4bdd8e2a09316', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:20:03', '2026-05-23 00:20:08', NULL);
 
 -- --------------------------------------------------------
 
@@ -2121,6 +2263,13 @@ ALTER TABLE `estudiants_historia`
   ADD KEY `fk_historia_estudiant` (`nia`);
 
 --
+-- Indices de la tabla `estudios_centre`
+--
+ALTER TABLE `estudios_centre`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_centre` (`id_centre`);
+
+--
 -- Indices de la tabla `estudis`
 --
 ALTER TABLE `estudis`
@@ -2286,6 +2435,12 @@ ALTER TABLE `estudiants_historia`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
+-- AUTO_INCREMENT de la tabla `estudios_centre`
+--
+ALTER TABLE `estudios_centre`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
 -- AUTO_INCREMENT de la tabla `gestio_absencies`
 --
 ALTER TABLE `gestio_absencies`
@@ -2307,7 +2462,7 @@ ALTER TABLE `hores_de_classe`
 -- AUTO_INCREMENT de la tabla `login_logs`
 --
 ALTER TABLE `login_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT de la tabla `matricula`
@@ -2407,6 +2562,12 @@ ALTER TABLE `estudiants_grupclasse`
 --
 ALTER TABLE `estudiants_historia`
   ADD CONSTRAINT `fk_historia_estudiant` FOREIGN KEY (`nia`) REFERENCES `estudiants` (`nia`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estudios_centre`
+--
+ALTER TABLE `estudios_centre`
+  ADD CONSTRAINT `estudios_centre_ibfk_1` FOREIGN KEY (`id_centre`) REFERENCES `centre` (`id_centre`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `estudis`
