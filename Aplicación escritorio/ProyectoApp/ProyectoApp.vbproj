@@ -100,10 +100,12 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Text.Json, Version=10.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -157,6 +159,24 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="UnidadItem.vb" />
+    <Compile Include="UserControlBoletinEstudiante.Designer.vb">
+      <DependentUpon>UserControlBoletinEstudiante.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UserControlBoletinEstudiante.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControlExpediente.Designer.vb">
+      <DependentUpon>UserControlExpediente.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UserControlExpediente.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControlExpedienteProfesor.Designer.vb">
+      <DependentUpon>UserControlExpedienteProfesor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UserControlExpedienteProfesor.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="UserControlExportacion.Designer.vb">
       <DependentUpon>UserControlExportacion.vb</DependentUpon>
     </Compile>
@@ -173,6 +193,12 @@
       <DependentUpon>UserControlHome.vb</DependentUpon>
     </Compile>
     <Compile Include="UserControlHome.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControlNotasProfesor.Designer.vb">
+      <DependentUpon>UserControlNotasProfesor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UserControlNotasProfesor.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControlPerfil.Designer.vb">
@@ -193,6 +219,12 @@
     <Compile Include="UserControlProfesores.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="UserControlVisorDirectiu.Designer.vb">
+      <DependentUpon>UserControlVisorDirectiu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UserControlVisorDirectiu.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
@@ -207,6 +239,15 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UserControlBoletinEstudiante.resx">
+      <DependentUpon>UserControlBoletinEstudiante.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControlExpediente.resx">
+      <DependentUpon>UserControlExpediente.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControlExpedienteProfesor.resx">
+      <DependentUpon>UserControlExpedienteProfesor.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControlExportacion.resx">
       <DependentUpon>UserControlExportacion.vb</DependentUpon>
     </EmbeddedResource>
@@ -216,11 +257,17 @@
     <EmbeddedResource Include="UserControlHome.resx">
       <DependentUpon>UserControlHome.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UserControlNotasProfesor.resx">
+      <DependentUpon>UserControlNotasProfesor.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControlPonerNotas.resx">
       <DependentUpon>UserControlPonerNotas.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControlProfesores.resx">
       <DependentUpon>UserControlProfesores.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControlVisorDirectiu.resx">
+      <DependentUpon>UserControlVisorDirectiu.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +282,9 @@
     </None>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

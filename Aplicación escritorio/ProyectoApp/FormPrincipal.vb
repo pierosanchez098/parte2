@@ -3,11 +3,18 @@
     Private Sub FormPrincipal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         btnExportacion.Visible = (My.Settings.Rol = "directiu" OrElse My.Settings.Rol = "admin")
         btnGestionPeriodos.Visible = (My.Settings.Rol = "directiu" OrElse My.Settings.Rol = "professor" OrElse My.Settings.Rol = "admin")
+        btnExpediente.Visible = (My.Settings.Rol = "estudiant" OrElse My.Settings.Rol = "alumne")
+        btnExpedienteProfesor.Visible = (My.Settings.Rol = "professor")
+        btnBoletin.Visible = (My.Settings.Rol = "estudiant")
+        btnBoletinProfesor.Visible = (My.Settings.Rol = "professor")
+        btnConfigCentro.Visible = (My.Settings.Rol = "directiu")
+
+
 
         pnlSidebar.BackColor = Color.FromArgb(30, 30, 35)
         pnlSidebar.Padding = New Padding(10)
 
-        Dim botones = {btnInicio, btnProfesores, btnGestionPeriodos, btnExportacion, btnCerrarSesion}
+        Dim botones = {btnInicio, btnProfesores, btnExpediente, btnGestionPeriodos, btnExportacion, btnCerrarSesion, btnExpedienteProfesor, btnBoletin, btnBoletinProfesor, btnConfigCentro}
 
         For Each btn As Button In botones
             btn.FlatStyle = FlatStyle.Flat
@@ -48,6 +55,8 @@
     Private Sub btnInicio_Click(sender As Object, e As EventArgs) Handles btnInicio.Click
         CargarContenido(New UserControlHome())
     End Sub
+
+
 
 
     Private Sub btnProfesores_Click(sender As Object, e As EventArgs) Handles btnProfesores.Click
@@ -94,5 +103,25 @@
             login.Show()
             Me.Close()
         End If
+    End Sub
+
+    Private Sub btnExpediente_Click(sender As Object, e As EventArgs) Handles btnExpediente.Click
+        CargarContenido(New UserControlExpediente())
+    End Sub
+
+    Private Sub btnExpedienteProfesor_Click(sender As Object, e As EventArgs) Handles btnExpedienteProfesor.Click
+        CargarContenido(New UserControlExpedienteProfesor())
+    End Sub
+
+    Private Sub btnBoletin_Click(sender As Object, e As EventArgs) Handles btnBoletin.Click
+        CargarContenido(New UserControlBoletinEstudiante())
+    End Sub
+
+    Private Sub btnBoletinProfesor_Click(sender As Object, e As EventArgs) Handles btnBoletinProfesor.Click
+        CargarContenido(New UserControlNotasProfesor())
+    End Sub
+
+    Private Sub btnConfigCentro_Click(sender As Object, e As EventArgs) Handles btnConfigCentro.Click
+        CargarContenido(New UserControlVisorDirectiu())
     End Sub
 End Class

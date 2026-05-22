@@ -1,16 +1,12 @@
 ﻿Imports System.Net.Http
 Imports System.Text
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
-Imports Newtonsoft.Json
+Imports System.Web.Script.Serialization
 
 Public Class Form1
 
-
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
         Dim ColorPrimario As Color = Color.FromArgb(37, 99, 235)
         Dim ColorFondo As Color = Color.FromArgb(248, 250, 252)
-        Dim ColorTexto As Color = Color.FromArgb(30, 41, 59)
 
         Me.BackColor = ColorFondo
         Me.StartPosition = FormStartPosition.CenterScreen
@@ -31,7 +27,6 @@ Public Class Form1
     End Sub
 
     Private Async Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
-
         Dim user As String = txtUser.Text.Trim()
         Dim pass As String = txtPass.Text.Trim()
 
@@ -41,6 +36,7 @@ Public Class Form1
         End If
 
         Dim baseUrl As String = "http://localhost/login_desktop.php"
+        Dim userAgentHash As String = GenerarHardwareHash()
 
         Dim handler As New HttpClientHandler()
         handler.ServerCertificateCustomValidationCallback = Function(req, cert, chain, errors) True
@@ -48,7 +44,8 @@ Public Class Form1
         Using client As New HttpClient(handler)
             Dim content As New FormUrlEncodedContent(New Dictionary(Of String, String) From {
                 {"user", user},
-                {"pass", pass}
+                {"pass", pass},
+                {"user_agent_hash", userAgentHash}
             })
 
             Try
@@ -56,13 +53,15 @@ Public Class Form1
                 Dim jsonResponse As String = Await response.Content.ReadAsStringAsync()
 
                 If response.IsSuccessStatusCode Then
-                    Dim result As Dictionary(Of String, Object) = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(jsonResponse)
+                    Dim serializer As New JavaScriptSerializer()
+                    Dim result As Dictionary(Of String, Object) = serializer.Deserialize(Of Dictionary(Of String, Object))(jsonResponse)
 
-                    If result.ContainsKey("pot_entrar") AndAlso CBool(result("pot_entrar")) Then
+                    If result IsNot Nothing AndAlso result.ContainsKey("pot_entrar") AndAlso Convert.ToBoolean(result("pot_entrar")) Then
+
+                        Dim rol As String = If(result.ContainsKey("rol"), result("rol").ToString().ToLower().Trim(), "estudiant")
 
                         Dim token As String = If(result.ContainsKey("token"), result("token").ToString(), "")
                         Dim dniPersona As String = If(result.ContainsKey("dni_persona"), result("dni_persona").ToString(), "")
-                        Dim rol As String = If(result.ContainsKey("rol"), result("rol").ToString(), "alumne")
                         Dim username As String = user
 
                         My.Settings.Token = token
@@ -71,26 +70,35 @@ Public Class Form1
                         My.Settings.Username = username
                         My.Settings.Save()
 
-                        MessageBox.Show("Login correcto", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        MessageBox.Show("Bienvenido a Evalis Escritorio", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
                         Dim principal As New FormPrincipal()
                         principal.Show()
                         Me.Hide()
-
                     Else
                         Dim errorMsg As String = If(result.ContainsKey("tipus_derror"), result("tipus_derror").ToString(), "Usuario o contraseña incorrectos")
                         MessageBox.Show(errorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     End If
                 Else
-                    MessageBox.Show("Error de conexión: " & response.StatusCode.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show("Error de conexión con el servidor: " & response.StatusCode.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End If
 
             Catch ex As Exception
-                MessageBox.Show("Excepción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("Error crítico en el proceso de Login: " & ex.Message, "Excepción", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
-
     End Sub
 
+    Private Function GenerarHardwareHash() As String
+        Dim infoHardware As String = Environment.MachineName & Environment.UserName & Environment.ProcessorCount.ToString()
+        Using sha256 As System.Security.Cryptography.SHA256 = System.Security.Cryptography.SHA256.Create()
+            Dim bytes As Byte() = sha256.ComputeHash(Encoding.UTF8.GetBytes(infoHardware))
+            Dim sb As New StringBuilder()
+            For i As Integer = 0 To bytes.Length - 1
+                sb.Append(bytes(i).ToString("x2"))
+            Next
+            Return sb.ToString()
+        End Using
+    End Function
 
 End Class

@@ -1,8 +1,11 @@
-﻿Imports MySql.Data.MySqlClient
+﻿Imports System.IO
+Imports System.Net
+Imports System.Text
+Imports System.Web.Script.Serialization
 
 Public Class UserControlPonerNotas
 
-    Private Const ConnString As String = "Server=localhost;Database=plataforma_evalis;Uid=root;Pwd=;"
+    Private Const BaseUrl As String = "http://localhost/"
 
     Private Sub UserControlPonerNotas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarDataGridView()
@@ -26,31 +29,33 @@ Public Class UserControlPonerNotas
         dgvNotas.Columns("nota").Width = 100
     End Sub
 
+
     Private Sub CargarGruposDelProfesor()
         cmbGrupo.Items.Clear()
 
-        Using conn As New MySqlConnection(ConnString)
-            Try
-                conn.Open()
-                Dim sql As String = "
-                    SELECT DISTINCT gc.nom, gc.aula 
-                    FROM professor_grup_classe pgc
-                    INNER JOIN grup_classe gc ON pgc.nom_grup = gc.nom
-                    WHERE pgc.dni_persona = @dni
-                    ORDER BY gc.nom"
+        Dim postData As String = String.Format(
+            "token={0}&user_agent_hash={1}&dni_profesor={2}",
+            Uri.EscapeDataString(My.Settings.Token),
+            Uri.EscapeDataString(GenerarHardwareHash()),
+            Uri.EscapeDataString(My.Settings.DniPersona)
+        )
 
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@dni", My.Settings.DniPersona)
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            cmbGrupo.Items.Add(reader("nom").ToString() & " - " & reader("aula").ToString())
-                        End While
-                    End Using
-                End Using
-            Catch ex As Exception
-                MessageBox.Show("Error al cargar grupos: " & ex.Message)
-            End Try
-        End Using
+        Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_grupos.php", postData)
+
+        If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
+            If jsonRespuesta.ContainsKey("grupos") Then
+                Dim listaGrupos As Object = jsonRespuesta("grupos")
+
+                For Each g As Object In CType(listaGrupos, IEnumerable)
+                    Dim grupoDict As Dictionary(Of String, Object) = CType(g, Dictionary(Of String, Object))
+                    Dim nom As String = grupoDict("nom").ToString()
+                    Dim aula As String = grupoDict("aula").ToString()
+                    cmbGrupo.Items.Add(nom & " - " & aula)
+                Next
+            End If
+        ElseIf jsonRespuesta IsNot Nothing Then
+            MessageBox.Show("Error al cargar grupos: " & jsonRespuesta("motivo").ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
     End Sub
 
     Private Sub cmbGrupo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbGrupo.SelectedIndexChanged
@@ -59,91 +64,80 @@ Public Class UserControlPonerNotas
         CargarUnidades(nomGrupo)
     End Sub
 
+
     Private Sub CargarUnidades(nomGrupo As String)
         cmbUnidad.Items.Clear()
 
-        Using conn As New MySqlConnection(ConnString)
-            Try
-                conn.Open()
-                Dim sql As String = "
-                SELECT u.id, u.num, 
-                       CONCAT(m.nom_complet, ' - ', u.tipus, ' ', u.nom) AS unidad
-                FROM unitat u
-                INNER JOIN modul m ON u.modul = m.nom
-                INNER JOIN grupclasse_assignatura gca ON m.codi_assignatura = gca.codi_assignatura
-                WHERE gca.nom_grupclasse = @nomGrupo
-                ORDER BY m.nom_complet, u.num"
+        Dim postData As String = String.Format(
+            "token={0}&user_agent_hash={1}&nom_grup={2}",
+            Uri.EscapeDataString(My.Settings.Token),
+            Uri.EscapeDataString(GenerarHardwareHash()),
+            Uri.EscapeDataString(nomGrupo)
+        )
 
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@nomGrupo", nomGrupo)
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            Dim displayText As String = reader("unidad").ToString()
+        Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_unidades.php", postData)
 
-                            If Not reader.IsDBNull(reader.GetOrdinal("num")) Then
-                                displayText &= " (RA " & reader("num").ToString() & ")"
-                            End If
+        If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
+            If jsonRespuesta.ContainsKey("unidades") Then
+                Dim listaUnidades As Object = jsonRespuesta("unidades")
 
-                            Dim item As New UnidadItem With {
-                            .Text = displayText,
-                            .Value = Convert.ToInt32(reader("id"))
-                        }
-
-                            cmbUnidad.Items.Add(item)
-                        End While
-                    End Using
-                End Using
-            Catch ex As Exception
-                MessageBox.Show("Error al cargar unidades: " & ex.Message)
-            End Try
-        End Using
+                For Each u As Object In CType(listaUnidades, IEnumerable)
+                    Dim unidadDict As Dictionary(Of String, Object) = CType(u, Dictionary(Of String, Object))
+                    Dim item As New UnidadItem With {
+                        .Text = unidadDict("unidad").ToString(),
+                        .Value = Convert.ToInt32(unidadDict("id"))
+                    }
+                    cmbUnidad.Items.Add(item)
+                Next
+            End If
+        ElseIf jsonRespuesta IsNot Nothing Then
+            MessageBox.Show("Error al cargar unidades: " & jsonRespuesta("motivo").ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
     End Sub
 
     Private Sub cmbUnidad_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbUnidad.SelectedIndexChanged
         If cmbUnidad.SelectedIndex = -1 Then Return
 
         Dim item As UnidadItem = DirectCast(cmbUnidad.SelectedItem, UnidadItem)
-        Dim idUnidad As Integer = item.Value
-
-        CargarAlumnos(idUnidad)
+        CargarAlumnos(item.Value)
     End Sub
+
 
     Private Sub CargarAlumnos(idUnidad As Integer)
         dgvNotas.Rows.Clear()
+        Dim nomGrupo As String = cmbGrupo.Text.Split("-"c)(0).Trim()
 
-        Using conn As New MySqlConnection(ConnString)
-            Try
-                conn.Open()
-                Dim sql As String = "
-                    SELECT 
-                        e.nia,
-                        CONCAT(p.nom, ' ', p.cognom) AS alumno,
-                        n.nota
-                    FROM estudiants_grupclasse eg
-                    INNER JOIN estudiants e ON eg.nia = e.nia
-                    INNER JOIN persona p ON e.dni_persona = p.dni
-                    LEFT JOIN notes n ON e.nia = n.nia AND n.uf_id = @idUnidad
-                    WHERE eg.nom_grup = @nomGrupo
-                    ORDER BY p.nom, p.cognom"
+        Dim postData As String = String.Format(
+            "token={0}&user_agent_hash={1}&uf_id={2}&nom_grup={3}",
+            Uri.EscapeDataString(My.Settings.Token),
+            Uri.EscapeDataString(GenerarHardwareHash()),
+            idUnidad.ToString(),
+            Uri.EscapeDataString(nomGrupo)
+        )
 
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@idUnidad", idUnidad)
-                    cmd.Parameters.AddWithValue("@nomGrupo", cmbGrupo.Text.Split("-"c)(0).Trim())
+        Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_alumnos_notas.php", postData)
 
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            dgvNotas.Rows.Add(
-                                reader("nia"),
-                                reader("alumno").ToString(),
-                                If(reader("nota") Is DBNull.Value, "", reader("nota"))
-                            )
-                        End While
-                    End Using
-                End Using
-            Catch ex As Exception
-                MessageBox.Show("Error al cargar alumnos: " & ex.Message)
-            End Try
-        End Using
+        If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
+            If jsonRespuesta.ContainsKey("alumnos") Then
+                Dim listaAlumnos As Object = jsonRespuesta("alumnos")
+
+                For Each al As Object In CType(listaAlumnos, IEnumerable)
+                    Dim alumnoDict As Dictionary(Of String, Object) = CType(al, Dictionary(Of String, Object))
+
+                    Dim nia As String = alumnoDict("nia").ToString()
+                    Dim alumno As String = alumnoDict("alumno").ToString()
+
+                    Dim notaStr As String = ""
+                    If alumnoDict.ContainsKey("nota") AndAlso alumnoDict("nota") IsNot Nothing Then
+                        notaStr = alumnoDict("nota").ToString()
+                    End If
+
+                    dgvNotas.Rows.Add(nia, alumno, notaStr)
+                Next
+            End If
+        ElseIf jsonRespuesta IsNot Nothing Then
+            MessageBox.Show("Error al cargar alumnos: " & jsonRespuesta("motivo").ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
     End Sub
 
     Private Sub btnGuardarNotas_Click(sender As Object, e As EventArgs) Handles btnGuardarNotas.Click
@@ -152,39 +146,52 @@ Public Class UserControlPonerNotas
             Return
         End If
 
-        Dim idUnidad As Integer = DirectCast(cmbUnidad.SelectedItem, Object).Value
+        Dim itemUnidad As UnidadItem = DirectCast(cmbUnidad.SelectedItem, UnidadItem)
+        Dim idUnidad As Integer = itemUnidad.Value
 
-        Using conn As New MySqlConnection(ConnString)
-            Try
-                conn.Open()
+        Dim listaNotas As New List(Of Dictionary(Of String, Object))()
 
-                For Each row As DataGridViewRow In dgvNotas.Rows
-                    If row.IsNewRow Then Continue For
+        For Each row As DataGridViewRow In dgvNotas.Rows
+            If row.IsNewRow Then Continue For
 
-                    Dim nia As Integer = Convert.ToInt32(row.Cells("nia").Value)
-                    Dim nota As String = row.Cells("nota").Value?.ToString().Trim()
+            Dim nia As String = row.Cells("nia").Value?.ToString()
+            Dim nota As String = row.Cells("nota").Value?.ToString().Trim()
 
-                    If String.IsNullOrEmpty(nota) Then Continue For
+            If Not String.IsNullOrEmpty(nia) AndAlso Not String.IsNullOrEmpty(nota) Then
+                Dim notaDict As New Dictionary(Of String, Object) From {
+                    {"nia", Convert.ToInt32(nia)},
+                    {"nota", Convert.ToDecimal(nota)}
+                }
+                listaNotas.Add(notaDict)
+            End If
+        Next
 
-                    Dim sql As String = "
-                        INSERT INTO notes (nia, uf_id, nota, data_nota)
-                        VALUES (@nia, @uf_id, @nota, NOW())
-                        ON DUPLICATE KEY UPDATE nota = @nota, data_nota = NOW()"
+        If listaNotas.Count = 0 Then
+            MessageBox.Show("No hay notas válidas para guardar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
 
-                    Using cmd As New MySqlCommand(sql, conn)
-                        cmd.Parameters.AddWithValue("@nia", nia)
-                        cmd.Parameters.AddWithValue("@uf_id", idUnidad)
-                        cmd.Parameters.AddWithValue("@nota", nota)
-                        cmd.ExecuteNonQuery()
-                    End Using
-                Next
+        Dim jss As New JavaScriptSerializer()
+        Dim jsonNotas As String = jss.Serialize(listaNotas)
 
-                MessageBox.Show("Notas guardadas correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Dim postData As String = String.Format(
+            "token={0}&user_agent_hash={1}&dni_profesor={2}&uf_id={3}&notas={4}",
+            Uri.EscapeDataString(My.Settings.Token),
+            Uri.EscapeDataString(GenerarHardwareHash()),
+            Uri.EscapeDataString(My.Settings.DniPersona),
+            idUnidad.ToString(),
+            Uri.EscapeDataString(jsonNotas)
+        )
 
-            Catch ex As Exception
-                MessageBox.Show("Error al guardar notas: " & ex.Message)
-            End Try
-        End Using
+        Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("guardar_notas.php", postData)
+
+        If jsonRespuesta IsNot Nothing Then
+            If jsonRespuesta("status").ToString() = "success" Then
+                MessageBox.Show(jsonRespuesta("motivo").ToString(), "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Else
+                MessageBox.Show("Error: " & jsonRespuesta("motivo").ToString(), "Denegado", MessageBoxButtons.OK, MessageBoxIcon.Stop)
+            End If
+        End If
     End Sub
 
     Private Sub dgvNotas_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles dgvNotas.CellValidating
@@ -207,6 +214,59 @@ Public Class UserControlPonerNotas
             End If
         End If
     End Sub
+
+    Private Function EnviarPeticionWeb(endpoint As String, postData As String) As Dictionary(Of String, Object)
+        Try
+            Dim urlCompleta As String = BaseUrl & endpoint
+            Dim request As HttpWebRequest = CType(WebRequest.Create(urlCompleta), HttpWebRequest)
+            request.Method = "POST"
+            request.ContentType = "application/x-www-form-urlencoded"
+
+            ServicePointManager.ServerCertificateValidationCallback = Function() True
+
+            Dim byteArray As Byte() = Encoding.UTF8.GetBytes(postData)
+            request.ContentLength = byteArray.Length
+
+            Using dataStream As Stream = request.GetRequestStream()
+                dataStream.Write(byteArray, 0, byteArray.Length)
+            End Using
+
+            Using response As HttpWebResponse = CType(request.GetResponse(), HttpWebResponse)
+                Using reader As New StreamReader(response.GetResponseStream())
+                    Dim responseFromServer As String = reader.ReadToEnd()
+
+                    Dim jss As New JavaScriptSerializer()
+                    Dim resultado As Dictionary(Of String, Object) = jss.Deserialize(Of Dictionary(Of String, Object))(responseFromServer)
+
+                    If resultado IsNot Nothing AndAlso resultado.ContainsKey("new_token") Then
+                        Dim nuevoToken As String = resultado("new_token")?.ToString()
+                        If Not String.IsNullOrEmpty(nuevoToken) Then
+                            My.Settings.Token = nuevoToken
+                            My.Settings.Save()
+                        End If
+                    End If
+
+                    Return resultado
+                End Using
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("Error crítico de comunicación con el servidor: " & ex.Message, "Error de red", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return Nothing
+        End Try
+    End Function
+
+    Private Function GenerarHardwareHash() As String
+        Dim infoHardware As String = Environment.MachineName & Environment.UserName & Environment.ProcessorCount.ToString()
+        Using sha256 As System.Security.Cryptography.SHA256 = System.Security.Cryptography.SHA256.Create()
+            Dim bytes As Byte() = sha256.ComputeHash(Encoding.UTF8.GetBytes(infoHardware))
+            Dim sb As New StringBuilder()
+            For i As Integer = 0 To bytes.Length - 1
+                sb.Append(bytes(i).ToString("x2"))
+            Next
+            Return sb.ToString()
+        End Using
+    End Function
 
     Private Sub EstilizarDataGridView(dgv As DataGridView)
         With dgv
