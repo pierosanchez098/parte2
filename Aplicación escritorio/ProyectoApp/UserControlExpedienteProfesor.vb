@@ -8,6 +8,7 @@ Imports iTextSharp.text.pdf
 Public Class UserControlExpedienteProfesor
 
     Private Const BaseUrl As String = "http://localhost/"
+    Private datosAlumnoActual As Dictionary(Of String, Object)
 
     Private Class AlumnoItem
         Public Property DisplayName As String
@@ -65,7 +66,6 @@ Public Class UserControlExpedienteProfesor
         CargarAlumnosDelGrupo(nomGrupo)
     End Sub
 
-
     Private Sub CargarAlumnosDelGrupo(nomGrupo As String)
         lstAlumnos.DataSource = Nothing
         lstAlumnos.Items.Clear()
@@ -113,8 +113,6 @@ Public Class UserControlExpedienteProfesor
         CargarExpedienteAlumno(niaSeleccionado)
     End Sub
 
-
-
     Private Sub CargarExpedienteAlumno(nia As String)
         dgvEstudios.Rows.Clear()
         LimpiarFichaDetalle()
@@ -129,23 +127,12 @@ Public Class UserControlExpedienteProfesor
         Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_expediente_alumno.php", postData)
 
         If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
+            datosAlumnoActual = jsonRespuesta
+
             lblNombre.Text = jsonRespuesta("nombre_alumno").ToString()
             lblDni.Text = jsonRespuesta("dni_alumno").ToString()
             lblEmail.Text = jsonRespuesta("email_alumno").ToString()
 
-            If jsonRespuesta.ContainsKey("foto") AndAlso jsonRespuesta("foto") IsNot Nothing AndAlso Not String.IsNullOrEmpty(jsonRespuesta("foto").ToString()) Then
-                Try
-                    Dim fotoBase64 As String = jsonRespuesta("foto").ToString()
-                    Dim imageBytes As Byte() = Convert.FromBase64String(fotoBase64)
-                    Using ms As New MemoryStream(imageBytes)
-                        picFoto.Image = System.Drawing.Image.FromStream(ms)
-                    End Using
-                Catch ex As Exception
-                    picFoto.Image = Nothing
-                End Try
-            Else
-                picFoto.Image = Nothing
-            End If
 
             If jsonRespuesta.ContainsKey("estudis") Then
                 Dim listaEstudios As Object = jsonRespuesta("estudis")
@@ -171,9 +158,8 @@ Public Class UserControlExpedienteProfesor
         lblNombre.Text = "-"
         lblDni.Text = "-"
         lblEmail.Text = "-"
-        picFoto.Image = Nothing
+        datosAlumnoActual = Nothing
     End Sub
-
 
     Private Sub btnExportarPDF_Click(sender As Object, e As EventArgs) Handles btnExportarPDF.Click
         If lblNombre.Text = "-" OrElse String.IsNullOrEmpty(lblNombre.Text) Then
@@ -193,19 +179,71 @@ Public Class UserControlExpedienteProfesor
                     PdfWriter.GetInstance(doc, fs)
                     doc.Open()
 
-                    Dim fontTitulo As Font = FontFactory.GetFont("Segoe UI", 18, iTextSharp.text.Font.BOLD, BaseColor.BLACK)
-                    Dim fontSubtitulo As Font = FontFactory.GetFont("Segoe UI", 12, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
+                    Dim colorPrimario As New BaseColor(30, 30, 35)
+                    Dim fontTitulo As Font = FontFactory.GetFont("Segoe UI", 18, iTextSharp.text.Font.BOLD, colorPrimario)
+                    Dim fontCentro As Font = FontFactory.GetFont("Segoe UI", 11, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
+                    Dim fontSubtitulo As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.ITALIC, BaseColor.GRAY)
+                    Dim fontSeccion As Font = FontFactory.GetFont("Segoe UI", 12, iTextSharp.text.Font.BOLD, colorPrimario)
                     Dim fontTexto As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK)
                     Dim fontCabecera As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.BOLD, BaseColor.WHITE)
+                    Dim fontFirmas As Font = FontFactory.GetFont("Segoe UI", 9, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
 
-                    Dim titulo As New Paragraph("EXPEDIENTE ACADÉMICO DE ESTUDIANTE", fontTitulo)
-                    titulo.Alignment = Element.ALIGN_CENTER
-                    titulo.SpacingAfter = 20
-                    doc.Add(titulo)
+                    Dim tablaCabecera As New PdfPTable(2)
+                    tablaCabecera.WidthPercentage = 100
+                    tablaCabecera.SetWidths({70.0F, 30.0F})
 
-                    Dim tablaFicha As New PdfPTable(2)
+                    Dim celdaTextosCab As New PdfPCell()
+                    celdaTextosCab.Border = iTextSharp.text.Rectangle.NO_BORDER
+
+                    Dim pTitulo As New Paragraph("EXPEDIENTE ACADÉMICO DE ESTUDIANTE", fontTitulo)
+                    pTitulo.SpacingAfter = 2
+                    celdaTextosCab.AddElement(pTitulo)
+
+                    Dim nombreCentro As String = "Centro no asignado"
+                    If datosAlumnoActual IsNot Nothing AndAlso datosAlumnoActual.ContainsKey("centro_educativo") Then
+                        nombreCentro = datosAlumnoActual("centro_educativo").ToString()
+                    End If
+
+                    Dim pCentro As New Paragraph("Centro Educativo: " & nombreCentro, fontCentro)
+                    pCentro.SpacingAfter = 2
+                    celdaTextosCab.AddElement(pCentro)
+
+                    Dim pSub As New Paragraph("EVALIS - Resguardo Informativo Oficial", fontSubtitulo)
+                    celdaTextosCab.AddElement(pSub)
+                    tablaCabecera.AddCell(celdaTextosCab)
+
+                    Dim celdaLogoCab As New PdfPCell()
+                    celdaLogoCab.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    celdaLogoCab.HorizontalAlignment = Element.ALIGN_RIGHT
+
+                    If datosAlumnoActual IsNot Nothing AndAlso datosAlumnoActual.ContainsKey("logo_centro") AndAlso datosAlumnoActual("logo_centro") IsNot Nothing AndAlso Not String.IsNullOrEmpty(datosAlumnoActual("logo_centro").ToString()) Then
+                        Try
+                            Dim logoStr As String = datosAlumnoActual("logo_centro").ToString()
+                            Dim imgLogo As iTextSharp.text.Image = Nothing
+
+                            If logoStr.StartsWith("data:image") OrElse logoStr.Length > 200 Then
+                                Dim base64Data As String = logoStr.Substring(logoStr.IndexOf(",") + 1)
+                                Dim imageBytes As Byte() = Convert.FromBase64String(base64Data)
+                                imgLogo = iTextSharp.text.Image.GetInstance(imageBytes)
+                            Else
+                                imgLogo = iTextSharp.text.Image.GetInstance(logoStr)
+                            End If
+
+                            If imgLogo IsNot Nothing Then
+                                imgLogo.ScaleToFit(110.0F, 50.0F)
+                                imgLogo.Alignment = Element.ALIGN_RIGHT
+                                celdaLogoCab.AddElement(imgLogo)
+                            End If
+                        Catch ex As Exception
+                        End Try
+                    End If
+                    tablaCabecera.AddCell(celdaLogoCab)
+
+                    tablaCabecera.SpacingAfter = 25
+                    doc.Add(tablaCabecera)
+
+                    Dim tablaFicha As New PdfPTable(1)
                     tablaFicha.WidthPercentage = 100
-                    tablaFicha.SetWidths({75.0F, 25.0F})
                     tablaFicha.SpacingAfter = 25
 
                     Dim celdaDatos As New PdfPCell()
@@ -216,36 +254,21 @@ Public Class UserControlExpedienteProfesor
                     If lstAlumnos.SelectedValue IsNot Nothing Then
                         celdaDatos.AddElement(New Paragraph("NIA Estudiante: " & lstAlumnos.SelectedValue.ToString(), fontTexto))
                     End If
+
                     tablaFicha.AddCell(celdaDatos)
-
-                    Dim celdaFoto As New PdfPCell()
-                    celdaFoto.Border = iTextSharp.text.Rectangle.NO_BORDER
-                    celdaFoto.HorizontalAlignment = Element.ALIGN_RIGHT
-
-                    If picFoto.Image IsNot Nothing Then
-                        Try
-                            Using ms As New MemoryStream()
-                                picFoto.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png)
-                                Dim imgPdf As iTextSharp.text.Image = iTextSharp.text.Image.GetInstance(ms.ToArray())
-                                imgPdf.ScaleToFit(85.0F, 110.0F)
-                                celdaFoto.AddElement(imgPdf)
-                            End Using
-                        Catch ex As Exception
-                        End Try
-                    End If
-                    tablaFicha.AddCell(celdaFoto)
                     doc.Add(tablaFicha)
 
-                    Dim subtitulo As New Paragraph("HISTORIAL ACADÉMICO DE ASIGNATURAS Y ESTUDIOS", fontSubtitulo)
+                    Dim subtitulo As New Paragraph("EXPEDIENTE ACADÉMICO", fontSeccion)
                     subtitulo.SpacingAfter = 10
                     doc.Add(subtitulo)
 
                     Dim tablaEstudios As New PdfPTable(dgvEstudios.Columns.Count)
                     tablaEstudios.WidthPercentage = 100
                     tablaEstudios.SetWidths({40.0F, 15.0F, 15.0F, 15.0F, 15.0F})
+
                     For Each col As DataGridViewColumn In dgvEstudios.Columns
                         Dim cellHeader As New PdfPCell(New Phrase(col.HeaderText, fontCabecera))
-                        cellHeader.BackgroundColor = New BaseColor(30, 30, 35)
+                        cellHeader.BackgroundColor = colorPrimario
                         cellHeader.HorizontalAlignment = Element.ALIGN_CENTER
                         cellHeader.Padding = 6
                         tablaEstudios.AddCell(cellHeader)
@@ -267,10 +290,36 @@ Public Class UserControlExpedienteProfesor
                             tablaEstudios.AddCell(cellPdf)
                         Next
                     Next
-
                     doc.Add(tablaEstudios)
-                    doc.Close()
 
+                    Dim tablaFirmas As New PdfPTable(3)
+                    tablaFirmas.WidthPercentage = 100
+                    tablaFirmas.SpacingBefore = 60
+                    tablaFirmas.SetWidths({30.0F, 35.0F, 30.0F})
+
+                    Dim cellProf As New PdfPCell(New Paragraph("Firma del Profesor" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellProf.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellProf.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellProf)
+
+                    Dim cellJefe As New PdfPCell(New Paragraph("Firma del Jefe de Estudios" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellJefe.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellJefe.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellJefe)
+
+                    Dim cellCent As New PdfPCell(New Paragraph("Sello / Firma del Centro" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellCent.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellCent.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellCent)
+
+                    doc.Add(tablaFirmas)
+
+                    Dim pPie As New Paragraph(Environment.NewLine & "Este documento sirve como resguardo informativo del expediente académico del alumno en la fecha indicada y carece de validez legal de certificación arancelaria.", fontSubtitulo)
+                    pPie.Alignment = Element.ALIGN_CENTER
+                    pPie.SpacingBefore = 25
+                    doc.Add(pPie)
+
+                    doc.Close()
                     MessageBox.Show("El expediente se ha exportado correctamente a PDF.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End Using
             Catch ex As Exception

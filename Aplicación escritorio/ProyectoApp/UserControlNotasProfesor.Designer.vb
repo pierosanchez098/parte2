@@ -27,13 +27,14 @@ Partial Class UserControlNotasProfesor
         Me.cmbGrupo = New System.Windows.Forms.ComboBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.btnExportarPDF = New System.Windows.Forms.Button()
+        Me.Label2 = New System.Windows.Forms.Label()
         CType(Me.dgvBoletinAlumno, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'dgvBoletinAlumno
         '
         Me.dgvBoletinAlumno.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvBoletinAlumno.Location = New System.Drawing.Point(247, 80)
+        Me.dgvBoletinAlumno.Location = New System.Drawing.Point(274, 104)
         Me.dgvBoletinAlumno.Name = "dgvBoletinAlumno"
         Me.dgvBoletinAlumno.Size = New System.Drawing.Size(649, 392)
         Me.dgvBoletinAlumno.TabIndex = 0
@@ -41,7 +42,7 @@ Partial Class UserControlNotasProfesor
         'lstAlumnos
         '
         Me.lstAlumnos.FormattingEnabled = True
-        Me.lstAlumnos.Location = New System.Drawing.Point(54, 77)
+        Me.lstAlumnos.Location = New System.Drawing.Point(81, 101)
         Me.lstAlumnos.Name = "lstAlumnos"
         Me.lstAlumnos.Size = New System.Drawing.Size(137, 394)
         Me.lstAlumnos.TabIndex = 1
@@ -49,7 +50,7 @@ Partial Class UserControlNotasProfesor
         'cmbGrupo
         '
         Me.cmbGrupo.FormattingEnabled = True
-        Me.cmbGrupo.Location = New System.Drawing.Point(386, 39)
+        Me.cmbGrupo.Location = New System.Drawing.Point(413, 63)
         Me.cmbGrupo.Name = "cmbGrupo"
         Me.cmbGrupo.Size = New System.Drawing.Size(205, 21)
         Me.cmbGrupo.TabIndex = 2
@@ -57,7 +58,7 @@ Partial Class UserControlNotasProfesor
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(256, 42)
+        Me.Label1.Location = New System.Drawing.Point(283, 66)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(82, 13)
         Me.Label1.TabIndex = 3
@@ -65,24 +66,34 @@ Partial Class UserControlNotasProfesor
         '
         'btnExportarPDF
         '
-        Me.btnExportarPDF.Location = New System.Drawing.Point(409, 498)
+        Me.btnExportarPDF.Location = New System.Drawing.Point(436, 522)
         Me.btnExportarPDF.Name = "btnExportarPDF"
         Me.btnExportarPDF.Size = New System.Drawing.Size(163, 41)
         Me.btnExportarPDF.TabIndex = 4
         Me.btnExportarPDF.Text = "Exportar a PDF"
         Me.btnExportarPDF.UseVisualStyleBackColor = True
         '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(484, 22)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(113, 13)
+        Me.Label2.TabIndex = 5
+        Me.Label2.Text = "Buscar boletín alumno"
+        '
         'UserControlNotasProfesor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.btnExportarPDF)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmbGrupo)
         Me.Controls.Add(Me.lstAlumnos)
         Me.Controls.Add(Me.dgvBoletinAlumno)
         Me.Name = "UserControlNotasProfesor"
-        Me.Size = New System.Drawing.Size(962, 575)
+        Me.Size = New System.Drawing.Size(1016, 594)
         CType(Me.dgvBoletinAlumno, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -94,4 +105,5 @@ Partial Class UserControlNotasProfesor
     Friend WithEvents cmbGrupo As ComboBox
     Friend WithEvents Label1 As Label
     Friend WithEvents btnExportarPDF As Button
+    Friend WithEvents Label2 As Label
 End Class

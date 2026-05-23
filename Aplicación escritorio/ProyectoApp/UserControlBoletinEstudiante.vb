@@ -9,6 +9,7 @@ Public Class UserControlBoletinEstudiante
 
     Private Const BaseUrl As String = "http://localhost/"
     Private CursoReporte As String = "2025-2026"
+    Private datosBoletinActual As Dictionary(Of String, Object)
 
     Private Sub UserControlBoletinEstudiante_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarDataGridViewBoletin()
@@ -26,9 +27,9 @@ Public Class UserControlBoletinEstudiante
         dgvBoletin.Columns.Add("data_nota", "Fecha de Evaluación")
     End Sub
 
-
     Private Sub CargarBoletinNotas()
         dgvBoletin.Rows.Clear()
+        datosBoletinActual = Nothing
 
         Dim postData As String = String.Format(
             "token={0}&user_agent_hash={1}&dni_persona={2}",
@@ -40,6 +41,8 @@ Public Class UserControlBoletinEstudiante
         Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_boletin_estudiante.php", postData)
 
         If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
+            datosBoletinActual = jsonRespuesta
+
             If jsonRespuesta.ContainsKey("curso") Then
                 CursoReporte = jsonRespuesta("curso").ToString()
             End If
@@ -63,8 +66,6 @@ Public Class UserControlBoletinEstudiante
         End If
     End Sub
 
-
-
     Private Sub btnExportarPDF_Click(sender As Object, e As EventArgs) Handles btnExportarPDF.Click
         If dgvBoletin.Rows.Count = 0 Then
             MessageBox.Show("No hay calificaciones disponibles en el boletín para exportar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -83,19 +84,72 @@ Public Class UserControlBoletinEstudiante
                     PdfWriter.GetInstance(doc, fs)
                     doc.Open()
 
-                    Dim fontTitulo As Font = FontFactory.GetFont("Segoe UI", 18, iTextSharp.text.Font.BOLD, New BaseColor(0, 102, 204))
+                    Dim colorAzulInstitucional As New BaseColor(0, 122, 204)
+                    Dim fontTitulo As Font = FontFactory.GetFont("Segoe UI", 18, iTextSharp.text.Font.BOLD, colorAzulInstitucional)
+                    Dim fontCentro As Font = FontFactory.GetFont("Segoe UI", 11, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
+                    Dim fontSubtitulo As Font = FontFactory.GetFont("Segoe UI", 9, iTextSharp.text.Font.ITALIC, BaseColor.GRAY)
                     Dim fontTexto As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK)
-                    Dim fontDestacado As Font = FontFactory.GetFont("Segoe UI", 11, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
+                    Dim fontDestacado As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
                     Dim fontCabecera As Font = FontFactory.GetFont("Segoe UI", 10, iTextSharp.text.Font.BOLD, BaseColor.WHITE)
+                    Dim fontFirmas As Font = FontFactory.GetFont("Segoe UI", 9, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY)
 
-                    Dim titulo As New Paragraph("BOLETÍN DE CALIFICACIONES GENERALES", fontTitulo)
-                    titulo.Alignment = Element.ALIGN_CENTER
-                    titulo.SpacingAfter = 15
-                    doc.Add(titulo)
+                    Dim tablaCabecera As New PdfPTable(2)
+                    tablaCabecera.WidthPercentage = 100
+                    tablaCabecera.SetWidths({70.0F, 30.0F})
+
+                    Dim celdaTextos As New PdfPCell()
+                    celdaTextos.Border = iTextSharp.text.Rectangle.NO_BORDER
+
+                    Dim pTitulo As New Paragraph("BOLETÍN DE CALIFICACIONES GENERALES", fontTitulo)
+                    pTitulo.SpacingAfter = 2
+                    celdaTextos.AddElement(pTitulo)
+
+                    Dim nombreCentro As String = "Centro no asignado"
+                    If datosBoletinActual IsNot Nothing AndAlso datosBoletinActual.ContainsKey("centro_educativo") Then
+                        nombreCentro = datosBoletinActual("centro_educativo").ToString()
+                    End If
+
+                    Dim pCentro As New Paragraph("Centro Educativo: " & nombreCentro, fontCentro)
+                    pCentro.SpacingAfter = 2
+                    celdaTextos.AddElement(pCentro)
+
+                    Dim pSub As New Paragraph("EVALIS - Reporte Informativo Académico", fontSubtitulo)
+                    celdaTextos.AddElement(pSub)
+                    tablaCabecera.AddCell(celdaTextos)
+
+                    Dim celdaLogo As New PdfPCell()
+                    celdaLogo.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    celdaLogo.HorizontalAlignment = Element.ALIGN_RIGHT
+
+                    If datosBoletinActual IsNot Nothing AndAlso datosBoletinActual.ContainsKey("logo_centro") AndAlso datosBoletinActual("logo_centro") IsNot Nothing AndAlso Not String.IsNullOrEmpty(datosBoletinActual("logo_centro").ToString()) Then
+                        Try
+                            Dim logoStr As String = datosBoletinActual("logo_centro").ToString()
+                            Dim imgLogo As iTextSharp.text.Image = Nothing
+
+                            If logoStr.StartsWith("data:image") OrElse logoStr.Length > 200 Then
+                                Dim base64Data As String = logoStr.Substring(logoStr.IndexOf(",") + 1)
+                                Dim imageBytes As Byte() = Convert.FromBase64String(base64Data)
+                                imgLogo = iTextSharp.text.Image.GetInstance(imageBytes)
+                            Else
+                                imgLogo = iTextSharp.text.Image.GetInstance(logoStr)
+                            End If
+
+                            If imgLogo IsNot Nothing Then
+                                imgLogo.ScaleToFit(110.0F, 50.0F)
+                                imgLogo.Alignment = Element.ALIGN_RIGHT
+                                celdaLogo.AddElement(imgLogo)
+                            End If
+                        Catch ex As Exception
+                        End Try
+                    End If
+                    tablaCabecera.AddCell(celdaLogo)
+
+                    tablaCabecera.SpacingAfter = 20
+                    doc.Add(tablaCabecera)
 
                     Dim infoAlumno As New Paragraph()
                     infoAlumno.Alignment = Element.ALIGN_LEFT
-                    infoAlumno.SpacingAfter = 25
+                    infoAlumno.SpacingAfter = 20
                     infoAlumno.Add(New Chunk("Documento de Identidad (DNI): ", fontDestacado))
                     infoAlumno.Add(New Chunk(My.Settings.DniPersona & vbCrLf, fontTexto))
                     infoAlumno.Add(New Chunk("Año Académico / Curso: ", fontDestacado))
@@ -108,10 +162,9 @@ Public Class UserControlBoletinEstudiante
                     tablaPdf.WidthPercentage = 100
                     tablaPdf.SetWidths({35.0F, 35.0F, 12.0F, 18.0F})
 
-
                     For Each col As DataGridViewColumn In dgvBoletin.Columns
                         Dim cellHeader As New PdfPCell(New Phrase(col.HeaderText, fontCabecera))
-                        cellHeader.BackgroundColor = New BaseColor(0, 122, 204)
+                        cellHeader.BackgroundColor = colorAzulInstitucional
                         cellHeader.HorizontalAlignment = Element.ALIGN_CENTER
                         cellHeader.VerticalAlignment = Element.ALIGN_MIDDLE
                         cellHeader.Padding = 8
@@ -136,10 +189,36 @@ Public Class UserControlBoletinEstudiante
                             tablaPdf.AddCell(cellPdf)
                         Next
                     Next
-
                     doc.Add(tablaPdf)
-                    doc.Close()
 
+                    Dim tablaFirmas As New PdfPTable(3)
+                    tablaFirmas.WidthPercentage = 100
+                    tablaFirmas.SpacingBefore = 55
+                    tablaFirmas.SetWidths({32.0F, 36.0F, 32.0F})
+
+                    Dim cellProf As New PdfPCell(New Paragraph("Firma del Tutor / Profesor" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellProf.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellProf.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellProf)
+
+                    Dim cellJefe As New PdfPCell(New Paragraph("Firma del Jefe de Estudios" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellJefe.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellJefe.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellJefe)
+
+                    Dim cellCent As New PdfPCell(New Paragraph("Sello del Centro Educativo" & Environment.NewLine & "_______________________", fontFirmas))
+                    cellCent.Border = iTextSharp.text.Rectangle.NO_BORDER
+                    cellCent.HorizontalAlignment = Element.ALIGN_CENTER
+                    tablaFirmas.AddCell(cellCent)
+
+                    doc.Add(tablaFirmas)
+
+                    Dim pPie As New Paragraph(Environment.NewLine & "Este boletín de calificaciones tiene carácter estrictamente informativo para el alumno y tutores legales, careciendo de validez como certificación académica oficial.", fontSubtitulo)
+                    pPie.Alignment = Element.ALIGN_CENTER
+                    pPie.SpacingBefore = 20
+                    doc.Add(pPie)
+
+                    doc.Close()
                     MessageBox.Show("El boletín de notas se ha exportado correctamente a PDF.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End Using
             Catch ex As Exception
@@ -148,7 +227,6 @@ Public Class UserControlBoletinEstudiante
             End Try
         End If
     End Sub
-
 
     Private Function EnviarPeticionWeb(endpoint As String, postData As String) As Dictionary(Of String, Object)
         Try

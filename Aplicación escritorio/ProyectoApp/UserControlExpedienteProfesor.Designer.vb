@@ -25,13 +25,11 @@ Partial Class UserControlExpedienteProfesor
         Me.lblEmail = New System.Windows.Forms.Label()
         Me.lblDni = New System.Windows.Forms.Label()
         Me.lblNombre = New System.Windows.Forms.Label()
-        Me.picFoto = New System.Windows.Forms.PictureBox()
         Me.dgvEstudios = New System.Windows.Forms.DataGridView()
         Me.btnExportarPDF = New System.Windows.Forms.Button()
         Me.lstAlumnos = New System.Windows.Forms.ListBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.cmbGrupo = New System.Windows.Forms.ComboBox()
-        CType(Me.picFoto, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.dgvEstudios, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -61,14 +59,6 @@ Partial Class UserControlExpedienteProfesor
         Me.lblNombre.Size = New System.Drawing.Size(39, 13)
         Me.lblNombre.TabIndex = 9
         Me.lblNombre.Text = "Label1"
-        '
-        'picFoto
-        '
-        Me.picFoto.Location = New System.Drawing.Point(767, 72)
-        Me.picFoto.Name = "picFoto"
-        Me.picFoto.Size = New System.Drawing.Size(178, 159)
-        Me.picFoto.TabIndex = 8
-        Me.picFoto.TabStop = False
         '
         'dgvEstudios
         '
@@ -122,12 +112,10 @@ Partial Class UserControlExpedienteProfesor
         Me.Controls.Add(Me.lblEmail)
         Me.Controls.Add(Me.lblDni)
         Me.Controls.Add(Me.lblNombre)
-        Me.Controls.Add(Me.picFoto)
         Me.Controls.Add(Me.dgvEstudios)
         Me.Controls.Add(Me.btnExportarPDF)
         Me.Name = "UserControlExpedienteProfesor"
         Me.Size = New System.Drawing.Size(962, 575)
-        CType(Me.picFoto, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.dgvEstudios, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -137,7 +125,6 @@ Partial Class UserControlExpedienteProfesor
     Friend WithEvents lblEmail As Label
     Friend WithEvents lblDni As Label
     Friend WithEvents lblNombre As Label
-    Friend WithEvents picFoto As PictureBox
     Friend WithEvents dgvEstudios As DataGridView
     Friend WithEvents btnExportarPDF As Button
     Friend WithEvents lstAlumnos As ListBox

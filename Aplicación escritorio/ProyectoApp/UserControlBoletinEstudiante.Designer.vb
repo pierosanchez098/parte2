@@ -24,6 +24,7 @@ Partial Class UserControlBoletinEstudiante
     Private Sub InitializeComponent()
         Me.dgvBoletin = New System.Windows.Forms.DataGridView()
         Me.btnExportarPDF = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.dgvBoletin, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -44,19 +45,32 @@ Partial Class UserControlBoletinEstudiante
         Me.btnExportarPDF.Text = "Exportar en PDF"
         Me.btnExportarPDF.UseVisualStyleBackColor = True
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(411, 63)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(54, 13)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Mi boletín"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.TopCenter
+        '
         'UserControlBoletinEstudiante
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnExportarPDF)
         Me.Controls.Add(Me.dgvBoletin)
         Me.Name = "UserControlBoletinEstudiante"
         Me.Size = New System.Drawing.Size(962, 575)
         CType(Me.dgvBoletin, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents dgvBoletin As DataGridView
     Friend WithEvents btnExportarPDF As Button
+    Friend WithEvents Label1 As Label
 End Class
