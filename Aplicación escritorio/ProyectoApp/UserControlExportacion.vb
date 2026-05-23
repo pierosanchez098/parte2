@@ -12,18 +12,15 @@ Imports Newtonsoft.Json
 
 Public Class UserControlExportacion
 
-    Private Const ConnString As String = "Server=localhost;Database=plataforma_evalis;Uid=root;Pwd=;Convert Zero Datetime=True;"
 
     Private Sub UserControlExportacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarGruposParaCSV()
         CargarCentrosParaJson()
         CargarGruposParaExcel()
-        CargarGruposParaActa()
 
 
         btnExportarLogsXML.Visible = (My.Settings.Rol = "admin" OrElse My.Settings.Rol = "directiu")
         btnExportarProfesoresenJSON.Visible = (My.Settings.Rol = "admin")
-        btnGenerarActaPDF.Visible = (My.Settings.Rol = "directiu" OrElse My.Settings.Rol = "admin")
         btnExportarAlumnoscsv.Visible = (My.Settings.Rol = "admin")
 
         btnExportarAlumnoscsv.Visible = (My.Settings.Rol = "admin")
@@ -37,8 +34,6 @@ Public Class UserControlExportacion
         cmbGrupoExcel.Visible = (My.Settings.Rol = "admin")
         btnExportarAlumnosExcel.Visible = (My.Settings.Rol = "admin")
 
-        lblGrupoClaseActa.Visible = (My.Settings.Rol = "directiu" OrElse My.Settings.Rol = "admin")
-        cmbActa.Visible = (My.Settings.Rol = "directiu" OrElse My.Settings.Rol = "admin")
 
 
 
@@ -228,35 +223,7 @@ Public Class UserControlExportacion
         End If
     End Sub
 
-    Private Sub CargarGruposParaActa()
-        cmbActa.Items.Clear()
 
-        Dim postData As String = String.Format(
-            "token={0}&user_agent_hash={1}",
-            Uri.EscapeDataString(My.Settings.Token),
-            Uri.EscapeDataString(GenerarHardwareHash())
-        )
-
-        Dim jsonRespuesta As Dictionary(Of String, Object) = EnviarPeticionWeb("get_todos_grupos.php", postData)
-
-        If jsonRespuesta IsNot Nothing AndAlso jsonRespuesta("status").ToString() = "success" Then
-            Try
-                Dim jss As New JavaScriptSerializer()
-                Dim gruposRaw As String = jss.Serialize(jsonRespuesta("grupos"))
-                Dim listaGrupos As List(Of Dictionary(Of String, String)) = jss.Deserialize(Of List(Of Dictionary(Of String, String)))(gruposRaw)
-
-                For Each grupo As Dictionary(Of String, String) In listaGrupos
-                    Dim item As String = grupo("nom") & " - " & grupo("aula")
-                    cmbActa.Items.Add(item)
-                Next
-
-            Catch ex As Exception
-                MessageBox.Show("Error al estructurar el listado global de grupos: " & ex.Message, "Error de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        ElseIf jsonRespuesta IsNot Nothing Then
-            MessageBox.Show("No se pudieron cargar los grupos institucionales: " & jsonRespuesta("motivo").ToString(), "Error de Permisos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
-    End Sub
 
     Private Sub CargarGruposParaExcel()
         cmbGrupoExcel.Items.Clear()
@@ -321,112 +288,8 @@ Public Class UserControlExportacion
         End If
     End Sub
 
-    Private Sub btnGenerarActaPDF_Click(sender As Object, e As EventArgs) Handles btnGenerarActaPDF.Click
-        If cmbCSVGrupo.SelectedIndex = -1 Then
-            MessageBox.Show("Selecciona un grupo de clase", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
-        Dim nomGrupo As String = cmbCSVGrupo.Text.Split("-"c)(0).Trim()
-
-        Dim ruta As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                                        $"Acta_Evaluacion_{nomGrupo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf")
-
-        Try
-            GenerarActaPDF(nomGrupo, ruta)
-            MessageBox.Show("Acta generada correctamente en el Escritorio:" & vbCrLf & ruta,
-                           "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Catch ex As Exception
-            MessageBox.Show("Error al generar el PDF: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
-    Public Sub GenerarActaPDF(nomGrupo As String, rutaPDF As String)
-        Dim doc As New Document(PageSize.A4.Rotate(), 30, 30, 30, 30)
-
-        Try
-            Dim writer As PdfWriter = PdfWriter.GetInstance(doc, New FileStream(rutaPDF, FileMode.Create))
-            doc.Open()
-
-            Dim fontTitulo As Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18)
-            Dim fontSubtitulo As Font = FontFactory.GetFont(FontFactory.HELVETICA, 12)
-            Dim fontHeader As Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)
-            Dim fontRows As Font = FontFactory.GetFont(FontFactory.HELVETICA, 9)
-
-            Dim titulo As New Paragraph("Acta de evaluación", fontTitulo)
-            titulo.Alignment = Element.ALIGN_CENTER
-            doc.Add(titulo)
-
-            Dim subtitulo As New Paragraph("Grupo: " & nomGrupo & "   |   Curso Académico: 2025-2026", fontSubtitulo)
-            subtitulo.Alignment = Element.ALIGN_CENTER
-            doc.Add(subtitulo)
-            doc.Add(New Paragraph(" "))
 
 
-            Dim tabla As New PdfPTable(12) With {.WidthPercentage = 100}
-
-            Dim anchos() As Single = {25, 200, 30, 30, 30, 30, 30, 30, 30, 30, 30, 60}
-            tabla.SetWidths(anchos)
-
-            Dim cellN As New PdfPCell(New Phrase("Nº", fontHeader)) With {.BackgroundColor = BaseColor.LIGHT_GRAY, .HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 5}
-            tabla.AddCell(cellN)
-
-            Dim cellNom As New PdfPCell(New Phrase("Apellidos y Nombres", fontHeader)) With {.BackgroundColor = BaseColor.LIGHT_GRAY, .HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 5}
-            tabla.AddCell(cellNom)
-
-            For i As Integer = 1 To 9
-                Dim cellNota As New PdfPCell(New Phrase(i.ToString(), fontHeader)) With {.BackgroundColor = BaseColor.LIGHT_GRAY, .HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 5}
-                tabla.AddCell(cellNota)
-            Next
-
-            Dim cellProm As New PdfPCell(New Phrase("Promoción", fontHeader)) With {.BackgroundColor = BaseColor.LIGHT_GRAY, .HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 5}
-            tabla.AddCell(cellProm)
-
-            Using conn As New MySqlConnection(ConnString)
-                conn.Open()
-                Dim sql As String = "SELECT " &
-                                "ROW_NUMBER() OVER (ORDER BY p.cognom, p.nom) AS numero, " &
-                                "CONCAT(p.cognom, ', ', p.nom) AS nombre_completo " &
-                                "FROM estudiants_grupclasse eg " &
-                                "INNER JOIN estudiants e ON eg.nia = e.nia " &
-                                "INNER JOIN persona p ON e.dni_persona = p.dni " &
-                                "WHERE eg.nom_grup = @nomGrupo " &
-                                "ORDER BY p.cognom, p.nom"
-
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@nomGrupo", nomGrupo)
-
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        Dim rnd As New Random()
-
-                        While reader.Read()
-                            tabla.AddCell(New PdfPCell(New Phrase(reader("numero").ToString(), fontRows)) With {.HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 4})
-
-                            tabla.AddCell(New PdfPCell(New Phrase(reader("nombre_completo").ToString(), fontRows)) With {.Padding = 4})
-
-                            For i As Integer = 1 To 9
-                                Dim notaHardcoded As String = rnd.Next(5, 11).ToString()
-                                tabla.AddCell(New PdfPCell(New Phrase(notaHardcoded, fontRows)) With {.HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 4})
-                            Next
-
-                            tabla.AddCell(New PdfPCell(New Phrase("SÍ", fontRows)) With {.HorizontalAlignment = Element.ALIGN_CENTER, .Padding = 4})
-                        End While
-                    End Using
-                End Using
-            End Using
-
-            doc.Add(tabla)
-
-
-            doc.Add(New Paragraph(vbCrLf & "Firma del Jefe de Estudios: ___________________________" &
-                          "Firma del Director: ___________________________", fontSubtitulo))
-
-        Catch ex As Exception
-            MsgBox("Error crítico al generar el acta: " & ex.Message, MsgBoxStyle.Critical)
-        Finally
-            If doc.IsOpen() Then doc.Close()
-        End Try
-    End Sub
 
     Private Function EnviarPeticionWeb(endpoint As String, postData As String) As Dictionary(Of String, Object)
         Try

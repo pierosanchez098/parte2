@@ -35,8 +35,9 @@ Public Class Form1
             Return
         End If
 
-        Dim baseUrl As String = "http://localhost/login_desktop.php"
+        Dim baseUrl As String = "https://localhost/login_desktop.php"
         Dim userAgentHash As String = GenerarHardwareHash()
+
 
         Dim handler As New HttpClientHandler()
         handler.ServerCertificateCustomValidationCallback = Function(req, cert, chain, errors) True

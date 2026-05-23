@@ -67,9 +67,9 @@ Public Class UserControlExpediente
                         lblDni.Text = "DNI: " & result("dni_alumno").ToString()
                         lblEmail.Text = "Email: " & result("email_alumno").ToString()
 
-                        If result.ContainsKey("foto_carnet") AndAlso result("foto_carnet") IsNot Nothing AndAlso Not String.IsNullOrEmpty(result("foto_carnet").ToString()) Then
+                        If result.ContainsKey("foto") AndAlso result("foto") IsNot Nothing AndAlso Not String.IsNullOrEmpty(result("foto").ToString()) Then
                             Try
-                                Dim fotoStr As String = result("foto_carnet").ToString()
+                                Dim fotoStr As String = result("foto").ToString()
                                 If fotoStr.StartsWith("data:image") OrElse fotoStr.Length > 200 Then
                                     Dim base64Data As String = fotoStr.Substring(fotoStr.IndexOf(",") + 1)
                                     Dim imageBytes As Byte() = Convert.FromBase64String(base64Data)
@@ -86,7 +86,7 @@ Public Class UserControlExpediente
 
                         Dim listaEstudios As System.Collections.ArrayList = CType(result("estudis"), System.Collections.ArrayList)
                         dtEstudios = New DataTable()
-                        dtEstudios.Columns.Add("Estudio / Asignatura")
+                        dtEstudios.Columns.Add("Estudio")
                         dtEstudios.Columns.Add("Año Inicio")
                         dtEstudios.Columns.Add("Año Fin")
                         dtEstudios.Columns.Add("Estado")
@@ -131,18 +131,67 @@ Public Class UserControlExpediente
                 Dim colorGrisClaro As New BaseColor(241, 245, 249)
 
                 Dim fTitulo As Font = FontFactory.GetFont("Helvetica", 18, Font.Bold, colorPrimario)
+                Dim fCentro As Font = FontFactory.GetFont("Helvetica", 11, Font.Bold, colorTexto)
                 Dim fSubtitulo As Font = FontFactory.GetFont("Helvetica", 10, Font.Italic, BaseColor.GRAY)
                 Dim fSeccion As Font = FontFactory.GetFont("Helvetica", 12, Font.Bold, colorPrimario)
                 Dim fContenido As Font = FontFactory.GetFont("Helvetica", 10, Font.Bold, colorTexto)
                 Dim fCabeceraTabla As Font = FontFactory.GetFont("Helvetica", 10, Font.Bold, BaseColor.WHITE)
+                Dim fFirmas As Font = FontFactory.GetFont("Helvetica", 9, Font.Bold, colorTexto)
+
+
+                Dim tablaCabecera As New PdfPTable(2)
+                tablaCabecera.WidthPercentage = 100
+                tablaCabecera.SetWidths({70, 30})
+
+                Dim cellTextosCab As New PdfPCell()
+                cellTextosCab.Border = PdfPCell.NO_BORDER
 
                 Dim pTitulo As New Paragraph("EVALIS - PLATAFORMA EDUCATIVA", fTitulo)
                 pTitulo.SpacingAfter = 2
-                doc.Add(pTitulo)
+                cellTextosCab.AddElement(pTitulo)
+
+                Dim nombreCentro As String = "Centro no asignado"
+                If datosAlumno IsNot Nothing AndAlso datosAlumno.ContainsKey("centro_educativo") Then
+                    nombreCentro = datosAlumno("centro_educativo").ToString()
+                End If
+
+                Dim pCentro As New Paragraph("Centro Educativo: " & nombreCentro, fCentro)
+                pCentro.SpacingAfter = 2
+                cellTextosCab.AddElement(pCentro)
 
                 Dim pSub As New Paragraph("Expediente Académico Oficial de Estudios", fSubtitulo)
-                pSub.SpacingAfter = 20
-                doc.Add(pSub)
+                cellTextosCab.AddElement(pSub)
+                tablaCabecera.AddCell(cellTextosCab)
+
+                Dim cellLogoCab As New PdfPCell()
+                cellLogoCab.Border = PdfPCell.NO_BORDER
+                cellLogoCab.HorizontalAlignment = Element.ALIGN_RIGHT
+
+                If datosAlumno IsNot Nothing AndAlso datosAlumno.ContainsKey("logo_centro") AndAlso datosAlumno("logo_centro") IsNot Nothing AndAlso Not String.IsNullOrEmpty(datosAlumno("logo_centro").ToString()) Then
+                    Try
+                        Dim logoStr As String = datosAlumno("logo_centro").ToString()
+                        Dim imgLogo As iTextSharp.text.Image = Nothing
+
+                        If logoStr.StartsWith("data:image") OrElse logoStr.Length > 200 Then
+                            Dim base64Data As String = logoStr.Substring(logoStr.IndexOf(",") + 1)
+                            Dim imageBytes As Byte() = Convert.FromBase64String(base64Data)
+                            imgLogo = iTextSharp.text.Image.GetInstance(imageBytes)
+                        Else
+                            imgLogo = iTextSharp.text.Image.GetInstance(logoStr)
+                        End If
+
+                        If imgLogo IsNot Nothing Then
+                            imgLogo.ScaleToFit(110, 50)
+                            imgLogo.Alignment = Element.ALIGN_RIGHT
+                            cellLogoCab.AddElement(imgLogo)
+                        End If
+                    Catch ex As Exception
+                    End Try
+                End If
+                tablaCabecera.AddCell(cellLogoCab)
+
+                tablaCabecera.SpacingAfter = 20
+                doc.Add(tablaCabecera)
 
                 Dim tablaInfo As New PdfPTable(2)
                 tablaInfo.WidthPercentage = 100
@@ -189,7 +238,7 @@ Public Class UserControlExpediente
                 tablaInfo.SpacingAfter = 30
                 doc.Add(tablaInfo)
 
-                Dim pSec As New Paragraph("HISTORIAL DE ESTUDIOS MATRICULADOS", fSeccion)
+                Dim pSec As New Paragraph("EXPEDIENTE DE ESTUDIOS", fSeccion)
                 pSec.SpacingAfter = 10
                 doc.Add(pSec)
 
@@ -197,7 +246,7 @@ Public Class UserControlExpediente
                 tablaNotas.WidthPercentage = 100
                 tablaNotas.SetWidths({40, 15, 15, 15, 15})
 
-                Dim cabeceras() As String = {"Estudio / Asignatura", "Año Inicio", "Año Fin", "Estado", "Nota Final"}
+                Dim cabeceras() As String = {"Estudio", "Año Inicio", "Año Fin", "Estado", "Nota Final"}
                 For Each cab As String In cabeceras
                     Dim cellCab As New PdfPCell(New Phrase(cab, fCabeceraTabla))
                     cellCab.BackgroundColor = colorPrimario
@@ -239,9 +288,31 @@ Public Class UserControlExpediente
 
                 doc.Add(tablaNotas)
 
+                Dim tablaFirmas As New PdfPTable(3)
+                tablaFirmas.WidthPercentage = 100
+                tablaFirmas.SpacingBefore = 60
+                tablaFirmas.SetWidths({30, 35, 30})
+
+                Dim cellProf As New PdfPCell(New Paragraph("Firma del Profesor" & Environment.NewLine & "_______________________", fFirmas))
+                cellProf.Border = PdfPCell.NO_BORDER
+                cellProf.HorizontalAlignment = Element.ALIGN_CENTER
+                tablaFirmas.AddCell(cellProf)
+
+                Dim cellJefe As New PdfPCell(New Paragraph("Firma del Jefe de Estudios" & Environment.NewLine & "_______________________", fFirmas))
+                cellJefe.Border = PdfPCell.NO_BORDER
+                cellJefe.HorizontalAlignment = Element.ALIGN_CENTER
+                tablaFirmas.AddCell(cellJefe)
+
+                Dim cellCent As New PdfPCell(New Paragraph("Sello / Firma del Centro" & Environment.NewLine & "_______________________", fFirmas))
+                cellCent.Border = PdfPCell.NO_BORDER
+                cellCent.HorizontalAlignment = Element.ALIGN_CENTER
+                tablaFirmas.AddCell(cellCent)
+
+                doc.Add(tablaFirmas)
+
                 Dim pPie As New Paragraph(Environment.NewLine & "Este documento sirve como resguardo informativo del expediente académico del alumno en la fecha indicada y carece de validez legal de certificación arancelaria.", fSubtitulo)
                 pPie.Alignment = Element.ALIGN_CENTER
-                pPie.SpacingBefore = 40
+                pPie.SpacingBefore = 30
                 doc.Add(pPie)
 
                 MessageBox.Show("El expediente en formato PDF ha sido generado y guardado con éxito.", "PDF Guardado", MessageBoxButtons.OK, MessageBoxIcon.Information)

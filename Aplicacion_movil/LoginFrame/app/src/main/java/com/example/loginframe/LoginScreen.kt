@@ -161,7 +161,7 @@ fun LoginButton(
             thread {
                 try {
                     UnsafeSSL.ignoreSSLErrors()
-                    val baseUrl = "http://10.0.2.2"
+                    val baseUrl = "https://10.0.2.2"
                     val u = URLEncoder.encode(user, "UTF-8")
                     val p = URLEncoder.encode(pass, "UTF-8")
 

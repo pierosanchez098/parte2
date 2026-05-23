@@ -28,6 +28,7 @@ Partial Class UserControlExpediente
         Me.lblNombre = New System.Windows.Forms.Label()
         Me.lblDni = New System.Windows.Forms.Label()
         Me.lblEmail = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.dgvExpediente, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.picFoto, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -54,6 +55,7 @@ Partial Class UserControlExpediente
         Me.picFoto.Location = New System.Drawing.Point(740, 115)
         Me.picFoto.Name = "picFoto"
         Me.picFoto.Size = New System.Drawing.Size(178, 159)
+        Me.picFoto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.picFoto.TabIndex = 2
         Me.picFoto.TabStop = False
         '
@@ -84,10 +86,20 @@ Partial Class UserControlExpediente
         Me.lblEmail.TabIndex = 5
         Me.lblEmail.Text = "Label1"
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(405, 39)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(73, 13)
+        Me.Label1.TabIndex = 6
+        Me.Label1.Text = "Mi expediente"
+        '
         'UserControlExpediente
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblEmail)
         Me.Controls.Add(Me.lblDni)
         Me.Controls.Add(Me.lblNombre)
@@ -109,4 +121,5 @@ Partial Class UserControlExpediente
     Friend WithEvents lblNombre As Label
     Friend WithEvents lblDni As Label
     Friend WithEvents lblEmail As Label
+    Friend WithEvents Label1 As Label
 End Class

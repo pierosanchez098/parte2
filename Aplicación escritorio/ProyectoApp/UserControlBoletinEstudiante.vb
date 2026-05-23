@@ -20,8 +20,8 @@ Public Class UserControlBoletinEstudiante
         If dgvBoletin.Columns.Count > 0 Then Return
 
         dgvBoletin.Columns.Clear()
-        dgvBoletin.Columns.Add("modul", "Módulo / Asignatura")
-        dgvBoletin.Columns.Add("unitat", "Unidad Formativa")
+        dgvBoletin.Columns.Add("modul", "Módulo")
+        dgvBoletin.Columns.Add("unitat", "Unidad")
         dgvBoletin.Columns.Add("nota", "Nota")
         dgvBoletin.Columns.Add("data_nota", "Fecha de Evaluación")
     End Sub

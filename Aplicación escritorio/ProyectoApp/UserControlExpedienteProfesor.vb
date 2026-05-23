@@ -24,7 +24,7 @@ Public Class UserControlExpedienteProfesor
         If dgvEstudios.Columns.Count > 0 Then Return
 
         dgvEstudios.Columns.Clear()
-        dgvEstudios.Columns.Add("nom_estudi", "Estudio / Asignatura")
+        dgvEstudios.Columns.Add("nom_estudi", "Estudio")
         dgvEstudios.Columns.Add("curs_inici", "Año Inicio")
         dgvEstudios.Columns.Add("curs_fi", "Año Fin")
         dgvEstudios.Columns.Add("status", "Estado")

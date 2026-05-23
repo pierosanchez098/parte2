@@ -23,7 +23,6 @@ Partial Class UserControlExportacion
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.btnExportarLogsXML = New System.Windows.Forms.Button()
-        Me.btnGenerarActaPDF = New System.Windows.Forms.Button()
         Me.cmbCSVGrupo = New System.Windows.Forms.ComboBox()
         Me.lblGrupoClaseCSV = New System.Windows.Forms.Label()
         Me.btnExportarAlumnoscsv = New System.Windows.Forms.Button()
@@ -33,8 +32,6 @@ Partial Class UserControlExportacion
         Me.cmbGrupoExcel = New System.Windows.Forms.ComboBox()
         Me.lblGrupoClaseExcel = New System.Windows.Forms.Label()
         Me.btnExportarAlumnosExcel = New System.Windows.Forms.Button()
-        Me.lblGrupoClaseActa = New System.Windows.Forms.Label()
-        Me.cmbActa = New System.Windows.Forms.ComboBox()
         Me.SuspendLayout()
         '
         'btnExportarLogsXML
@@ -46,16 +43,6 @@ Partial Class UserControlExportacion
         Me.btnExportarLogsXML.TabIndex = 0
         Me.btnExportarLogsXML.Text = "Exportar XML de logs"
         Me.btnExportarLogsXML.UseVisualStyleBackColor = True
-        '
-        'btnGenerarActaPDF
-        '
-        Me.btnGenerarActaPDF.Location = New System.Drawing.Point(485, 211)
-        Me.btnGenerarActaPDF.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnGenerarActaPDF.Name = "btnGenerarActaPDF"
-        Me.btnGenerarActaPDF.Size = New System.Drawing.Size(176, 43)
-        Me.btnGenerarActaPDF.TabIndex = 1
-        Me.btnGenerarActaPDF.Text = "Generar acta de evaluación"
-        Me.btnGenerarActaPDF.UseVisualStyleBackColor = True
         '
         'cmbCSVGrupo
         '
@@ -88,7 +75,7 @@ Partial Class UserControlExportacion
         '
         'btnExportarProfesoresenJSON
         '
-        Me.btnExportarProfesoresenJSON.Location = New System.Drawing.Point(485, 425)
+        Me.btnExportarProfesoresenJSON.Location = New System.Drawing.Point(485, 371)
         Me.btnExportarProfesoresenJSON.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExportarProfesoresenJSON.Name = "btnExportarProfesoresenJSON"
         Me.btnExportarProfesoresenJSON.Size = New System.Drawing.Size(176, 43)
@@ -99,7 +86,7 @@ Partial Class UserControlExportacion
         'lblCentros
         '
         Me.lblCentros.AutoSize = True
-        Me.lblCentros.Location = New System.Drawing.Point(244, 439)
+        Me.lblCentros.Location = New System.Drawing.Point(244, 385)
         Me.lblCentros.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblCentros.Name = "lblCentros"
         Me.lblCentros.Size = New System.Drawing.Size(46, 13)
@@ -109,7 +96,7 @@ Partial Class UserControlExportacion
         'cmbCentroJson
         '
         Me.cmbCentroJson.FormattingEnabled = True
-        Me.cmbCentroJson.Location = New System.Drawing.Point(336, 437)
+        Me.cmbCentroJson.Location = New System.Drawing.Point(336, 383)
         Me.cmbCentroJson.Margin = New System.Windows.Forms.Padding(2)
         Me.cmbCentroJson.Name = "cmbCentroJson"
         Me.cmbCentroJson.Size = New System.Drawing.Size(126, 21)
@@ -118,7 +105,7 @@ Partial Class UserControlExportacion
         'cmbGrupoExcel
         '
         Me.cmbGrupoExcel.FormattingEnabled = True
-        Me.cmbGrupoExcel.Location = New System.Drawing.Point(336, 326)
+        Me.cmbGrupoExcel.Location = New System.Drawing.Point(336, 272)
         Me.cmbGrupoExcel.Name = "cmbGrupoExcel"
         Me.cmbGrupoExcel.Size = New System.Drawing.Size(121, 21)
         Me.cmbGrupoExcel.TabIndex = 8
@@ -126,7 +113,7 @@ Partial Class UserControlExportacion
         'lblGrupoClaseExcel
         '
         Me.lblGrupoClaseExcel.AutoSize = True
-        Me.lblGrupoClaseExcel.Location = New System.Drawing.Point(235, 329)
+        Me.lblGrupoClaseExcel.Location = New System.Drawing.Point(235, 275)
         Me.lblGrupoClaseExcel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblGrupoClaseExcel.Name = "lblGrupoClaseExcel"
         Me.lblGrupoClaseExcel.Size = New System.Drawing.Size(82, 13)
@@ -135,7 +122,7 @@ Partial Class UserControlExportacion
         '
         'btnExportarAlumnosExcel
         '
-        Me.btnExportarAlumnosExcel.Location = New System.Drawing.Point(485, 314)
+        Me.btnExportarAlumnosExcel.Location = New System.Drawing.Point(485, 260)
         Me.btnExportarAlumnosExcel.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExportarAlumnosExcel.Name = "btnExportarAlumnosExcel"
         Me.btnExportarAlumnosExcel.Size = New System.Drawing.Size(176, 43)
@@ -143,30 +130,10 @@ Partial Class UserControlExportacion
         Me.btnExportarAlumnosExcel.Text = "Exportar alumnos en Excel"
         Me.btnExportarAlumnosExcel.UseVisualStyleBackColor = True
         '
-        'lblGrupoClaseActa
-        '
-        Me.lblGrupoClaseActa.AutoSize = True
-        Me.lblGrupoClaseActa.Location = New System.Drawing.Point(235, 226)
-        Me.lblGrupoClaseActa.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblGrupoClaseActa.Name = "lblGrupoClaseActa"
-        Me.lblGrupoClaseActa.Size = New System.Drawing.Size(82, 13)
-        Me.lblGrupoClaseActa.TabIndex = 12
-        Me.lblGrupoClaseActa.Text = "Grupo de clase:"
-        '
-        'cmbActa
-        '
-        Me.cmbActa.FormattingEnabled = True
-        Me.cmbActa.Location = New System.Drawing.Point(336, 223)
-        Me.cmbActa.Name = "cmbActa"
-        Me.cmbActa.Size = New System.Drawing.Size(121, 21)
-        Me.cmbActa.TabIndex = 11
-        '
         'UserControlExportacion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.lblGrupoClaseActa)
-        Me.Controls.Add(Me.cmbActa)
         Me.Controls.Add(Me.btnExportarAlumnosExcel)
         Me.Controls.Add(Me.lblGrupoClaseExcel)
         Me.Controls.Add(Me.cmbGrupoExcel)
@@ -176,7 +143,6 @@ Partial Class UserControlExportacion
         Me.Controls.Add(Me.btnExportarAlumnoscsv)
         Me.Controls.Add(Me.lblGrupoClaseCSV)
         Me.Controls.Add(Me.cmbCSVGrupo)
-        Me.Controls.Add(Me.btnGenerarActaPDF)
         Me.Controls.Add(Me.btnExportarLogsXML)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "UserControlExportacion"
@@ -187,7 +153,6 @@ Partial Class UserControlExportacion
     End Sub
 
     Friend WithEvents btnExportarLogsXML As Button
-    Friend WithEvents btnGenerarActaPDF As Button
     Friend WithEvents cmbCSVGrupo As ComboBox
     Friend WithEvents lblGrupoClaseCSV As Label
     Friend WithEvents btnExportarAlumnoscsv As Button
@@ -197,6 +162,4 @@ Partial Class UserControlExportacion
     Friend WithEvents cmbGrupoExcel As ComboBox
     Friend WithEvents lblGrupoClaseExcel As Label
     Friend WithEvents btnExportarAlumnosExcel As Button
-    Friend WithEvents lblGrupoClaseActa As Label
-    Friend WithEvents cmbActa As ComboBox
 End Class
