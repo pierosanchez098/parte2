@@ -36,6 +36,20 @@ if (empty($nia)) {
 
 $curso_actual = '2025-2026'; 
 
+$sql_centro = "SELECT c.nom AS centro_nom, c.logo AS centro_logo 
+               FROM estudiants e
+               INNER JOIN persona p ON e.dni_persona = p.dni
+               LEFT JOIN centre c ON p.id_centre = c.id_centre 
+               WHERE e.nia = ?";
+$stmt_C = $conn->prepare($sql_centro);
+$stmt_C->bind_param("s", $nia);
+$stmt_C->execute();
+$res_centro = $stmt_C->get_result()->fetch_assoc();
+$stmt_C->close();
+
+$centro_educativo = $res_centro['centro_nom'] ?? "Centro no asignado";
+$logo_centro = $res_centro['centro_logo'] ?? null;
+
 $sql = "SELECT 
             m.nom_complet AS modul,
             u.nom AS unitat,
@@ -73,6 +87,8 @@ echo json_encode([
     "status" => "success",
     "notas" => $notas,
     "curso" => $curso_actual,
+    "centro_educativo" => $centro_educativo,
+    "logo_centro" => $logo_centro,
     "new_token" => $new_token
 ]);
 ?>

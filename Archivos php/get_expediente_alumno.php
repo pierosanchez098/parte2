@@ -29,9 +29,10 @@ if (empty($nia)) {
     exit;
 }
 
-$sql_alumno = "SELECT p.nom, p.cognom, p.dni, p.email, p.foto 
+$sql_alumno = "SELECT p.nom, p.cognom, p.dni, p.email, c.nom AS centro_nom, c.logo AS centro_logo
                FROM estudiants e 
                INNER JOIN persona p ON e.dni_persona = p.dni 
+               LEFT JOIN centre c ON p.id_centre = c.id_centre
                WHERE e.nia = ?";
 
 $stmt_A = $conn->prepare($sql_alumno);
@@ -76,7 +77,8 @@ echo json_encode([
     "nombre_alumno" => $alumnoData['nom'] . " " . $alumnoData['cognom'],
     "dni_alumno" => $alumnoData['dni'],
     "email_alumno" => $alumnoData['email'],
-    "foto" => $alumnoData['foto'],
+    "centro_educativo" => $alumnoData['centro_nom'] ?? "Centro no asignado",
+    "logo_centro" => $alumnoData['centro_logo'],
     "estudis" => $estudios,
     "new_token" => $new_token
 ]);
