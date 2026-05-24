@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-05-2026 a las 18:22:01
+-- Tiempo de generación: 24-05-2026 a las 15:47:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1455,7 +1455,14 @@ INSERT INTO `login_logs` (`id`, `login_timestamp`, `username`, `ip_direccio`, `l
 (202, '2026-05-23 16:03:19', 'tomeu.ramirez', '::1', 1),
 (203, '2026-05-23 16:05:05', 'margalida.crespi', '::1', 1),
 (204, '2026-05-23 16:18:34', 'tomeu.ramirez', '::1', 1),
-(205, '2026-05-23 16:19:19', 'maria.garcia', '::1', 1);
+(205, '2026-05-23 16:19:19', 'maria.garcia', '::1', 1),
+(206, '2026-05-23 22:54:43', 'tomeu.ramirez', '::1', 0),
+(207, '2026-05-23 22:54:47', 'tomeu.ramirez', '::1', 1),
+(208, '2026-05-23 23:02:26', 'elena.blanco', '::1', 1),
+(209, '2026-05-23 23:13:54', 'maria.garcia', '::1', 1),
+(210, '2026-05-23 23:20:51', 'maria.garcia', '::1', 1),
+(211, '2026-05-23 23:22:10', 'maria.garcia', '::1', 1),
+(212, '2026-05-23 23:24:08', 'anna.rodriguez', '::1', 1);
 
 -- --------------------------------------------------------
 
@@ -1962,11 +1969,13 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('07311b34badde9a00a1dbbdb27bd0015558c726677c8435124791dd7ee4cc6c3', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 16:03:19', '2026-05-23 16:03:57', NULL),
 ('092585105b521195c3a78fa9e7c63c0f18f8fb2b1a1100e134766b72fec72b33', 'maria.garcia', '192.168.1.25', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 11:32:28', '2026-05-23 11:32:35', NULL),
 ('0ac5445cec42d1487703cee9fc7ed1862b0ffcb10e793ea7b6f51fdb967f587f', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:30:49', '2026-05-22 15:33:12', NULL),
+('0d2e8dbeb222dc1555d1f76c5cf06fdb1d1012d96f3ba619afe3f8ad02143798', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 23:24:08', '2026-05-23 23:27:39', NULL),
 ('104a5d6e05361ef40730627c174f923448413d431e7de4df743f555e4e650d0d', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 15:25:57', '2026-05-23 15:25:57', NULL),
 ('105c9abc85bf5eaa118f19a7749a9d7567f928d5da275c7034bec9413a7e564f', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 23:03:25', '2026-05-22 23:07:45', NULL),
 ('1115b16ca868c02d1d629acca36c107ddab3cf77513d27ea05cf7174abe9a5f6', 'elena.blanco', '::1', 'unknown', '2026-05-06 16:22:13', '2026-05-06 16:22:13', NULL),
 ('1199709b9f4bc3b64329d563e788dc57f682b4f119962a2129ce362745ddc643', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 15:36:18', '2026-05-22 15:36:40', NULL),
 ('13c05966c5df52acfe631863d92dd5586f6c1d142024c909b071950e1d8ce103', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 10:54:36', '2026-05-23 10:55:30', NULL),
+('165a14e3bec2df2cb2b061648547a211eaaabc75043803778373bfb1cb781a08', 'tomeu.ramirez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 22:54:47', '2026-05-23 23:00:58', NULL),
 ('1732be8169444d1c0721b8b7a30cc27104a924d14edfee1662fc2af8798bb515', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 15:31:02', '2026-05-06 15:31:09', NULL),
 ('19196056abf67849faa9602a2cbc331adecce1f11b38067f2a59e5a49dfa066a', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 09:31:49', '2026-05-06 09:31:49', NULL),
 ('1e6dc426b0b5ad4908929fd5ad175ca2d496d4b7d8f77605cd1e9540c39eb980', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:11:47', '2026-05-22 12:12:04', NULL),
@@ -1976,6 +1985,7 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('244f7c5d57f245d69f2d23ed46f988ae4d89cfcd1169866c55d524be4e27789a', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 13:49:26', '2026-05-23 13:51:19', NULL),
 ('26378f86fb6cfe370a8a54f129ce5bf8c15e6b5c53e09ee92224a3375b29791c', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:22:55', '2026-05-06 12:22:55', NULL),
 ('26abbadacff7e79da9511ca0d441ec6f92df6e73ca23509388ef14a926891169', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 02:02:21', '2026-05-06 02:08:01', NULL),
+('2787d8643bfde86d02203d7b10fc08197a3e5cc371b22e5599e08be61919ca12', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 23:20:51', '2026-05-23 23:21:37', NULL),
 ('28cb96bc34ec76eeaf435b305edb5942fcd8a6e73ed827c3d569620809da6695', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:04:34', '2026-05-06 13:04:34', NULL),
 ('2903a10c6167fd3398198ef92be59fff0d8b7b911b4f133fe7a75702bd5565e2', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 13:53:45', '2026-05-06 13:53:45', NULL),
 ('2cb98d2b22a829f4b9aa7f97f5a6941a34f4ea60a433c7e5133c74dde6cbd60a', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 22:10:19', '2026-05-22 22:12:22', NULL),
@@ -1985,8 +1995,10 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('3050ae8500dc6f5503119e9439afe8a3af574313271d9345df4cc81c954714f8', 'elena.blanco', '::1', 'unknown', '2026-05-06 12:18:22', '2026-05-06 12:18:22', NULL),
 ('32a65cdfa3ac0a86bc3cad85fa678eeb0606f7e8931404404beef1c27a9d89be', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:22:20', '2026-05-23 00:22:27', NULL),
 ('32c9fdaea4df160c8ed3235a444dd7811b464050cd891a8506cb0c962b7d8132', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:50:42', '2026-05-22 14:50:45', NULL),
+('3351e4800f1f7a2530b2598c3fd94774911f90c36e178c993a62a6d2adbfe85e', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 23:13:54', '2026-05-23 23:18:28', NULL),
 ('33664a6bf6d76c60fc5b3e189b154838a3a9dd716e1d54f822981239e332d199', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 00:05:38', '2026-05-23 00:05:41', NULL),
 ('3631ff3b4070a48fcf623dea49d4c3b63503caa49e8303e2ce19c61ab26f4ee6', 'anna.rodriguez', '::1', 'unknown', '2026-05-06 09:27:52', '2026-05-06 09:27:52', NULL),
+('3638f27aea0a9b11d9ee10ba4853c207828a5efd86c0462372b8858e01ca7fcb', 'maria.garcia', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 23:22:10', '2026-05-23 23:22:15', NULL),
 ('36d651fd18809089def18534d13befe6f8638f954e2f2de0bb427419dd539930', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 11:30:16', '2026-05-22 11:31:37', NULL),
 ('37affeb573e5b3ebbda760faeb42ba6b6f866274c229c560e09b80ad92b8aa60', 'maria.garcia', '::1', 'unknown', '2026-05-06 15:00:29', '2026-05-06 15:00:29', NULL),
 ('3ac95fda9a1bf93346942e8692e7baad8ed0629489724941dce4b0118173ca75', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 12:16:43', '2026-05-22 12:16:47', NULL),
@@ -2022,6 +2034,7 @@ INSERT INTO `sessions` (`token_hash`, `username`, `ip_address`, `user_agent`, `s
 ('7a2e2e9939fe397819da33e798629902d62c148798ef6d07eb0b1582612ec244', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 13:26:00', '2026-05-23 13:26:03', NULL),
 ('7c9190e47fda1390f489da0c4d41f4c00903517f6a20dd5067e49687c0259862', 'elena.blanco', '::1', 'unknown', '2026-05-06 13:04:53', '2026-05-06 13:04:53', NULL),
 ('7cdbcb173434bcc9f58b5e871a0266b5f4fb0f15e724364f317578fc854a601d', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 19:06:54', '2026-05-06 19:07:07', NULL),
+('7f106fbe8c8635e5cf414a6fef391eb0c2226d18e738a47babf24c44d29b278a', 'elena.blanco', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-23 23:02:26', '2026-05-23 23:13:40', NULL),
 ('81247277cf2debefe6d8813c9dbc4b851295ab851a2303ad780a464de9128de3', 'anna.rodriguez', '::1', '2f0bcd739a35981783e2b64f145eef2202a4eaff7f652d9645c6aad77ae90826', '2026-05-22 14:52:41', '2026-05-22 14:52:44', NULL),
 ('812fa36c0a28881f489ae1b70dbd61cac4bb885e4eb8df554165ea09e95d758f', 'tomeu.ramirez', '::1', 'unknown', '2026-05-06 14:05:17', '2026-05-06 14:05:17', NULL),
 ('83964c8f7c851ee94b97ed221601552e153fc9888eb05f360406d54a7ec60d92', 'anna.rodriguez', '127.0.0.1', 'Dalvik/2.1.0 (Linux; U; Android 16; sdk_gphone64_x86_64 Build/BE2A.250530.026.F3)', '2026-05-06 01:58:22', '2026-05-06 02:00:09', '2026-05-06 02:00:09'),
@@ -2538,7 +2551,7 @@ ALTER TABLE `hores_de_classe`
 -- AUTO_INCREMENT de la tabla `login_logs`
 --
 ALTER TABLE `login_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
 
 --
 -- AUTO_INCREMENT de la tabla `matricula`
