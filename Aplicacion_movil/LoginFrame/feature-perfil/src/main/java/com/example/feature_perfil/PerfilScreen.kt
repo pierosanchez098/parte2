@@ -103,30 +103,21 @@ fun PerfilScreen(dniPersona: String, modifier: Modifier = Modifier) {
             val imagenProcesada = ImageUtils.procesarImagen(bitmap)
             val bytes = ImageUtils.comprimirImagen(imagenProcesada)
 
-            ImageUtils.guardarEnGaleria(context, imagenProcesada)
-
             coroutineScope.launch {
-                val uriLocal = withContext(Dispatchers.IO) {
-                    ImageUtils.obtenerUriDeImagen(context, imagenProcesada)
-                }
-                perfil = perfil?.copy(foto = uriLocal.toString())
-
                 val exitoSubida = withContext(Dispatchers.IO) {
                     ImageUtils.subirFotoAlServidor(dniPersona, bytes)
                 }
-
                 if (exitoSubida) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.profile_toast_photo_updated),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val uriLocal = withContext(Dispatchers.IO) {
+                        ImageUtils.obtenerUriDeImagen(context, imagenProcesada)
+                    }
+                    perfil = perfil?.copy(foto = uriLocal.toString())
+
+                    ImageUtils.guardarEnGaleria(context, imagenProcesada)
+
+                    Toast.makeText(context, context.getString(R.string.profile_toast_photo_updated), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.profile_toast_photo_error),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(context, context.getString(R.string.profile_toast_photo_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
